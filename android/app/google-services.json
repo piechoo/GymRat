@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "999882760125",
+    "project_id": "gymrat-98347",
+    "storage_bucket": "gymrat-98347.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999882760125:android:84d61a90b3eebe4b7efcd4",
+        "android_client_info": {
+          "package_name": "com.piechoo.gymrat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "999882760125-ih65c4v0f8dn3inhfq0lu7eai07ahk35.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.piechoo.gymrat",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "999882760125-6gur45uvoiekmg9kml9cv5r2unu4pdvq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFEOabx5-zSVM9RTJdZhX23VDrevDS9rA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "999882760125-6gur45uvoiekmg9kml9cv5r2unu4pdvq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

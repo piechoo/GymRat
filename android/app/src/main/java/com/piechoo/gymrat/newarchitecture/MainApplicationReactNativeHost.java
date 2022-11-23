@@ -1,4 +1,4 @@
-package com.myapp.newarchitecture;
+package com.piechoo.gymrat.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.myapp.BuildConfig;
-import com.myapp.newarchitecture.components.MainComponentsRegistry;
-import com.myapp.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.piechoo.gymrat.BuildConfig;
+import com.piechoo.gymrat.newarchitecture.components.MainComponentsRegistry;
+import com.piechoo.gymrat.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

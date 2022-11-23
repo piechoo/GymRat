@@ -1,4 +1,4 @@
-package com.myapp;
+package com.piechoo.gymrat;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
