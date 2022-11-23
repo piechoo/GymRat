@@ -2,6 +2,7 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { ExampleContainer } from '@/Containers'
 import { FacebookSignIn } from '@/Components/FacebookLogin/FacebookSignIn'
+import { Authentication } from '@/Components/Authentication/Authentication'
 
 const Tab = createBottomTabNavigator()
 
@@ -19,7 +20,7 @@ const MainNavigator = () => {
       />
       <Tab.Screen
         name="Login"
-        component={FacebookSignIn}
+        component={Authentication}
         options={{
           tabBarIconStyle: { display: 'none' },
           tabBarLabelPosition: 'beside-icon',
