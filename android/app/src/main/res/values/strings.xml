@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">GymRat</string>
-    <string name="facebook_app_id">464580105586447</string>
-    <string name="facebook_client_token">c30ecc7b2bb21f4e80cb32b1a943737d</string>
+    <string name="facebook_app_id">appid</string>
+    <string name="facebook_client_token">clienttoken</string>
 </resources>
