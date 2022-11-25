@@ -1,6 +1,6 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { ExampleContainer } from '@/Containers'
+import { ExampleContainer, ExcercisesListContainer } from '@/Containers'
 import { FacebookSignIn } from '@/Components/FacebookLogin/FacebookSignIn'
 import { Authentication } from '@/Components/Authentication/Authentication'
 
@@ -21,6 +21,22 @@ const MainNavigator = () => {
       <Tab.Screen
         name="Login"
         component={Authentication}
+        options={{
+          tabBarIconStyle: { display: 'none' },
+          tabBarLabelPosition: 'beside-icon',
+        }}
+      />
+      <Tab.Screen
+        name="Bodyparts"
+        component={ExcercisesListContainer}
+        options={{
+          tabBarIconStyle: { display: 'none' },
+          tabBarLabelPosition: 'beside-icon',
+        }}
+      />
+      <Tab.Screen
+        name="Excercises"
+        component={ExcercisesListContainer}
         options={{
           tabBarIconStyle: { display: 'none' },
           tabBarLabelPosition: 'beside-icon',

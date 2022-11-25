@@ -14,16 +14,18 @@ import {
 
 import { api } from '@/Services/api'
 import theme from './Theme'
+import excercises from './Excercises'
 
 const reducers = combineReducers({
   theme,
+  excercises,
   api: api.reducer,
 })
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['theme'],
+  whitelist: ['theme', 'excercises'],
 }
 
 const persistedReducer = persistReducer(persistConfig, reducers)
