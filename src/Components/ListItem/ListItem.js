@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { View, Image } from 'react-native'
+import { View, Image, StyleSheet, Pressable, Text } from 'react-native'
 import { useTheme } from '@/Hooks'
 
 const styles = StyleSheet.create({
@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 18,
     height: 44,
+    color: 'black',
   },
 })
 

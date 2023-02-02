@@ -7,12 +7,18 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Brand } from '@/Components'
 import { useTheme } from '@/Hooks'
-import { useLazyFetchOneQuery } from '@/Services/modules/users'
 import { changeTheme } from '@/Store/Theme'
+import {
+  getUserName,
+  setUserHeight,
+  setUserName,
+  setUserWeight,
+} from '@/Store/User'
+import { navigateAndSimpleReset } from '@/Navigators/utils'
 
 const ExampleContainer = () => {
   const { t } = useTranslation()
@@ -20,69 +26,75 @@ const ExampleContainer = () => {
   const dispatch = useDispatch()
 
   const [userId, setUserId] = useState('9')
-  const [fetchOne, { data, isSuccess, isLoading, isFetching, error }] =
-    useLazyFetchOneQuery()
-
-  useEffect(() => {
-    fetchOne(userId)
-  }, [fetchOne, userId])
 
   const onChangeTheme = ({ theme, darkMode }) => {
     dispatch(changeTheme({ theme, darkMode }))
   }
 
+  const userName = useSelector(getUserName)
+
   return (
     <ScrollView
-      style={Layout.fill}
-      contentContainerStyle={[
-        Layout.fill,
-        Layout.colCenter,
-        Gutters.smallHPadding,
-      ]}
+      style={Layout.fullSize}
+      contentContainerStyle={[Gutters.smallHPadding]}
     >
       <View style={[[Layout.colCenter, Gutters.smallHPadding]]}>
         <Brand />
-        {(isLoading || isFetching) && <ActivityIndicator />}
-        {!isSuccess ? (
-          <Text style={Fonts.textRegular}>{error}</Text>
-        ) : (
-          <Text style={Fonts.textRegular}>
-            {t('example.helloUser', { name: data?.name })}
-          </Text>
-        )}
+        <ActivityIndicator />
+        <Text style={Fonts.textRegular}>
+          {t('example.helloUser', { name: 'Gienio' })}
+        </Text>
       </View>
       <View
         style={[
-          Layout.row,
-          Layout.rowHCenter,
+          Layout.column,
+          Layout.fullWidth,
           Gutters.smallHPadding,
-          Gutters.largeVMargin,
           Common.backgroundPrimary,
         ]}
       >
-        <Text style={[Layout.fill, Fonts.textCenter, Fonts.textSmall]}>
-          {t('example.labels.userId')}
+        <Text style={[Fonts.textCenter, Fonts.textSmall]}>
+          {t('Podaj nazwe')}
         </Text>
         <TextInput
-          onChangeText={setUserId}
-          editable={!isLoading}
+          onChangeText={name => dispatch(setUserName(name))}
+          value={userName}
+          selectTextOnFocus
+          style={[Common.textInput]}
+        />
+        <Text style={[Fonts.textCenter, Fonts.textSmall]}>
+          {t('Podaj swoja wage')}
+        </Text>
+        <TextInput
+          onChangeText={name => dispatch(setUserWeight(name))}
           keyboardType={'number-pad'}
           maxLength={1}
           value={userId}
           selectTextOnFocus
-          style={[Layout.fill, Common.textInput]}
+          style={[Common.textInput]}
+        />
+
+        <Text style={[Fonts.textCenter, Fonts.textSmall]}>
+          {t('Podaj swoj wzrost')}
+        </Text>
+        <TextInput
+          onChangeText={name => dispatch(setUserHeight(name))}
+          keyboardType={'number-pad'}
+          maxLength={1}
+          value={userId}
+          selectTextOnFocus
+          style={[Common.textInput]}
         />
       </View>
-      <Text style={[Fonts.textRegular, Gutters.smallBMargin]}>DarkMode :</Text>
 
       <TouchableOpacity
-        style={[Common.button.rounded, Gutters.regularBMargin]}
-        onPress={() => onChangeTheme({ darkMode: null })}
+        style={[Common.button.rounded, Gutters.regularVMargin]}
+        onPress={() => navigateAndSimpleReset('Main')}
       >
-        <Text style={Fonts.textRegular}>Auto</Text>
+        <Text style={Fonts.textRegular}>Zaloguj</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[Common.button.outlineRounded, Gutters.regularBMargin]}
         onPress={() => onChangeTheme({ darkMode: true })}
       >
@@ -94,7 +106,7 @@ const ExampleContainer = () => {
         onPress={() => onChangeTheme({ darkMode: false })}
       >
         <Text style={Fonts.textRegular}>Light</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </ScrollView>
   )
 }

@@ -1,4 +1,4 @@
-import { createSelector, createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import { excercises } from './consts'
 
 const slice = createSlice({
@@ -11,22 +11,10 @@ const slice = createSlice({
   },
 })
 
-const selectSelf = state => state
-export const getExcercises = createSelector(
-  selectSelf,
-  state => state.excercises,
-)
+export const getExcercises = state => state.excercises
 
-export const getBodypartExcercises = createSelector(
-  [
-    // Usual first input - extract value from `state`
-    state => getExcercises(state),
-    // Take the second arg, `category`, and forward to the output selector
-    (state, bodypart) => bodypart,
-  ],
-  // Output selector gets (`items, category)` as args
-  (excercises, bodypart) => excercises[bodypart],
-)
+export const getBodypartExcercises = (state, bodypart) =>
+  getExcercises(state)[bodypart]
 
 export const { addExcercise } = slice.actions
 

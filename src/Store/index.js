@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
-import { setupListeners } from '@reduxjs/toolkit/query'
 import {
   persistReducer,
   persistStore,
@@ -12,20 +11,20 @@ import {
   REGISTER,
 } from 'redux-persist'
 
-import { api } from '@/Services/api'
 import theme from './Theme'
 import excercises from './Excercises'
+import user from './User'
 
 const reducers = combineReducers({
   theme,
   excercises,
-  api: api.reducer,
+  user,
 })
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['theme', 'excercises'],
+  whitelist: ['theme', 'excercises', 'user'],
 }
 
 const persistedReducer = persistReducer(persistConfig, reducers)
@@ -37,7 +36,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(api.middleware)
+    })
 
     if (__DEV__ && !process.env.JEST_WORKER_ID) {
       const createDebugger = require('redux-flipper').default
@@ -49,7 +48,5 @@ const store = configureStore({
 })
 
 const persistor = persistStore(store)
-
-setupListeners(store.dispatch)
 
 export { store, persistor }
