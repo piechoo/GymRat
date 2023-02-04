@@ -2,25 +2,35 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { View, Image, StyleSheet, Pressable, Text } from 'react-native'
 import { useTheme } from '@/Hooks'
+import { Button } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: 22,
+    alignItems: 'flex-start',
+    // flex: 1,
+    // flexGrow: 1,
+    // minWidth: '100%',
   },
   item: {
-    padding: 10,
+    flex: 1,
     fontSize: 18,
     height: 44,
     color: 'black',
   },
 })
 
-const ListItem = ({ item, onClick }) => {
+const ListItem = ({ item, title, selected, onClick }) => {
   return (
-    <Pressable onPress={onClick}>
-      <Text style={styles.item}>{item}</Text>
-    </Pressable>
+    <Button
+      mode="text"
+      onPress={() => onClick(item)}
+      style={[
+        styles.container,
+        { backgroundColor: selected ? 'green' : 'transparent' },
+      ]}
+    >
+      <Text style={styles.item}>{title}</Text>
+    </Button>
   )
 }
 

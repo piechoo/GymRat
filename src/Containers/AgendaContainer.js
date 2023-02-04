@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, StyleSheet, FlatList, Text } from 'react-native'
+import { View, StyleSheet, FlatList, Text, Modal, Button } from 'react-native'
 
 import { bodyParts } from '@/Store/Excercises/consts'
 import ListItem from '@/Components/ListItem/ListItem'
@@ -18,6 +18,8 @@ const styles = StyleSheet.create({
 })
 
 const AgendaContainer = () => {
+  const [modalVisible, setModalVisible] = useState(false)
+
   return (
     <View style={styles.container}>
       <Agenda
@@ -108,13 +110,17 @@ const AgendaContainer = () => {
         // }}
         // // Override inner list with a custom implemented component
         renderList={listProps => {
+          console.log(listProps.selectedDay.toString())
           return (
-            <FlatList
-              data={Object.values(listProps.items)}
-              renderItem={({ item }) =>
-                item.map(element => <ListItem item={element.name} />)
-              }
-            />
+            <>
+              <FlatList
+                data={Object.values(listProps.items)}
+                renderItem={({ item }) =>
+                  item.map(element => <ListItem item={element.name} />)
+                }
+              />
+              <Button title="Press me" onPress={() => setModalVisible(true)} />
+            </>
           )
         }}
         // // Specify what should be rendered instead of ActivityIndicator
@@ -154,6 +160,19 @@ const AgendaContainer = () => {
         // // Agenda container style
         // style={{}}
       />
+
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(true)}
+      >
+        <View style={{ backgroundColor: 'rgba(0,0,0,0.4)', flex: 1 }}>
+          <View style={{ backgroundColor: 'orange', padding: 40, margin: 80 }}>
+            <Text>This is a modal</Text>
+            <Button title="close" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 }

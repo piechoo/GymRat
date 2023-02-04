@@ -4,6 +4,7 @@ import {
   AgendaContainer,
   ExampleContainer,
   ExcercisesListContainer,
+  WorkoutContainer,
 } from '@/Containers'
 import { FacebookSignIn } from '@/Components/FacebookLogin/FacebookSignIn'
 import { Authentication } from '@/Components/Authentication/Authentication'
@@ -41,6 +42,14 @@ const MainNavigator = () => {
       <Tab.Screen
         name="Agenda"
         component={AgendaContainer}
+        options={{
+          tabBarIconStyle: { display: 'none' },
+          tabBarLabelPosition: 'beside-icon',
+        }}
+      />
+      <Tab.Screen
+        name="Workout"
+        component={WorkoutContainer}
         options={{
           tabBarIconStyle: { display: 'none' },
           tabBarLabelPosition: 'beside-icon',

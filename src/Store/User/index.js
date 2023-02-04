@@ -13,11 +13,18 @@ const slice = createSlice({
     addUserWorkout: (state, { payload: { workout } }) => {
       state.workouts.push(workout)
     },
+    editUserWorkout: (state, { payload: { workout, date } }) => {
+      if (workout)
+        state.workouts = state.workouts.map(obj =>
+          obj.date !== date ? obj : workout,
+        )
+      else
+        state.workouts = state.workouts.filter(workout => workout.date !== date)
+    },
     addUserPlan: (state, { payload: { plan } }) => {
       state.plans.push(plan)
     },
     setUserName: (state, action) => {
-      console.log(action)
       state.name = action.payload
     },
     setUserHeight: (state, { payload: { height } }) => {
@@ -32,6 +39,8 @@ const slice = createSlice({
 export const getUser = state => state.user
 export const getUserName = state => getUser(state).name
 export const getUserWorkouts = state => getUser(state)?.workouts
+export const getUserDayWorkout = (state, date) =>
+  getUser(state)?.workouts.find(workout => workout.date === date)
 export const getUserPlans = state => getUser(state)?.plans
 
 export const {
@@ -40,6 +49,7 @@ export const {
   setUserName,
   setUserHeight,
   setUserWeight,
+  editUserWorkout,
 } = slice.actions
 
 export default slice.reducer

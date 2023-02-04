@@ -2,6 +2,10 @@ const execiseType = {
   weight: 'weight - reps',
   distance: 'distance - time',
 }
+
+export const defaultExcerciseValues = {
+  sets: [],
+}
 export const bodyParts = {
   chest: 'chest',
   back: 'back',

@@ -10,13 +10,13 @@ export default {
     },
   },
   bodyparts: {
-    chest: 'Chest',
-    back: 'Back',
-    legs: 'Legs',
-    shoulders: 'Shoulders',
+    chest: 'Klatka piersiowa',
+    back: 'Plecy',
+    legs: 'Nogi',
+    shoulders: 'Barki',
     biceps: 'Biceps',
     triceps: 'Triceps',
-    abs: 'Abdominals',
+    abs: 'Brzuch',
     cardio: 'Cardio',
   },
 }
