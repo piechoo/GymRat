@@ -4,6 +4,7 @@ import { View, StyleSheet, FlatList, Text, Modal, Button } from 'react-native'
 import { bodyParts } from '@/Store/Excercises/consts'
 import ListItem from '@/Components/ListItem/ListItem'
 import { Agenda } from 'react-native-calendars'
+import WorkoutContainer from './WorkoutContainer'
 
 const styles = StyleSheet.create({
   container: {
@@ -19,6 +20,7 @@ const styles = StyleSheet.create({
 
 const AgendaContainer = () => {
   const [modalVisible, setModalVisible] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(null)
 
   return (
     <View style={styles.container}>
@@ -52,17 +54,21 @@ const AgendaContainer = () => {
             { name: 'any js object' },
           ],
         }}
-        renderEmptyDate={() => {
-          return (
-            <View>
-              <Text>DUPA</Text>
-            </View>
-          )
-        }}
+        // renderEmptyDate={() => {
+        //   console.log(selectedDate)
+        //   return (
+        //     <View>
+        //       <Text>DUPA</Text>
+        //     </View>
+        //   )
+        // }}
         renderEmptyData={() => {
+          console.log(selectedDate)
+
           return (
             <View>
-              <Text style={{ color: 'black' }}>DUPA</Text>
+              <WorkoutContainer date={selectedDate?.dateString} />
+              {/* <Text style={{ color: 'black' }}>DUPppA</Text> */}
             </View>
           )
         }}
@@ -75,9 +81,9 @@ const AgendaContainer = () => {
         //   console.log(calendarOpened)
         // }}
         // // Callback that gets called on day press
-        // onDayPress={day => {
-        //   console.log('day pressed')
-        // }}
+        onDayPress={day => {
+          setSelectedDate(day)
+        }}
         // // Callback that gets called when day changes while scrolling agenda list
         // onDayChange={day => {
         //   console.log('day changed')
@@ -109,20 +115,20 @@ const AgendaContainer = () => {
         //   return <View />
         // }}
         // // Override inner list with a custom implemented component
-        renderList={listProps => {
-          console.log(listProps.selectedDay.toString())
-          return (
-            <>
-              <FlatList
-                data={Object.values(listProps.items)}
-                renderItem={({ item }) =>
-                  item.map(element => <ListItem item={element.name} />)
-                }
-              />
-              <Button title="Press me" onPress={() => setModalVisible(true)} />
-            </>
-          )
-        }}
+        // renderList={listProps => {
+        //   console.log(listProps.selectedDay.toString())
+        //   return (
+        //     <>
+        //       <FlatList
+        //         data={Object.values(listProps.items)}
+        //         renderItem={({ item }) =>
+        //           item.map(element => <ListItem item={element.name} />)
+        //         }
+        //       />
+        //       <Button title="Press me" onPress={() => setModalVisible(true)} />
+        //     </>
+        //   )
+        // }}
         // // Specify what should be rendered instead of ActivityIndicator
         // renderEmptyData={() => {
         //   return <View />

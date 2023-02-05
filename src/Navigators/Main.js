@@ -8,6 +8,7 @@ import {
 } from '@/Containers'
 import { FacebookSignIn } from '@/Components/FacebookLogin/FacebookSignIn'
 import { Authentication } from '@/Components/Authentication/Authentication'
+import { Provider } from 'react-native-paper'
 
 const Tab = createBottomTabNavigator()
 

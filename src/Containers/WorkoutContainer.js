@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { ActivityIndicator, View, Text } from 'react-native'
+import { ActivityIndicator, View, Text, ScrollView } from 'react-native'
 import { useTheme } from '@/Hooks'
 import { Brand } from '@/Components'
 import { setDefaultTheme } from '@/Store/Theme'
@@ -17,13 +17,20 @@ import ExcercisesList from './ExcercisesList'
 import { useCallback } from 'react'
 import { defaultExcerciseValues } from '@/Store/Excercises/consts'
 import { useMemo } from 'react'
+import WorkoutExcercise from '@/Components/WorkoutExcercise'
 
-const WorkoutContainer = ({ date = 21 }) => {
+const WorkoutContainer = ({ date }) => {
   const { Layout, Gutters, Fonts } = useTheme()
   const workout = useSelector(state => getUserDayWorkout(state, date))
   const [isFabOpen, setIsFabOpen] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [selectedExcercises, setSelectedExcercises] = useState([])
+  const [selectedExcercises, setSelectedExcercises] = useState(
+    workout?.excercises ?? [],
+  )
+
+  useEffect(() => {
+    setSelectedExcercises(workout?.excercises ?? [])
+  }, [workout?.excercises])
   const dispatch = useDispatch()
 
   const addExercises = useCallback(() => {
@@ -40,6 +47,65 @@ const WorkoutContainer = ({ date = 21 }) => {
     setIsModalVisible(false)
   }, [workout, date, selectedExcercises])
 
+  const removeExercise = useCallback(
+    excercise => {
+      const newExcercises = workout?.excercises ?? []
+      const filtered = newExcercises.filter(obj => obj.id !== excercise.id)
+      const newWorkout = { ...workout, excercises: filtered, date }
+      dispatch(editUserWorkout({ date, workout: newWorkout }))
+    },
+    [workout, date, selectedExcercises],
+  )
+
+  const addSerie = useCallback(
+    (excercise, serie) => {
+      const newExcercises = workout?.excercises ?? []
+      const filtered = newExcercises.map(obj => {
+        if (obj.id !== excercise.id) return obj
+        const copy = { ...obj }
+        console.log(copy)
+        copy.sets = [...copy.sets, serie]
+        return copy
+      })
+      const newWorkout = { ...workout, excercises: filtered, date }
+
+      console.log(filtered)
+      dispatch(editUserWorkout({ date, workout: newWorkout }))
+    },
+    [workout],
+  )
+  const deleteSerie = useCallback(
+    (excercise, index) => {
+      const newExcercises = workout?.excercises ?? []
+      const filtered = newExcercises.map(obj => {
+        if (obj.id !== excercise.id) return obj
+        const copy = { ...obj }
+        copy.sets.splice(index, 1)
+        return copy
+      })
+      const newWorkout = { ...workout, excercises: filtered, date }
+
+      dispatch(editUserWorkout({ date, workout: newWorkout }))
+    },
+    [workout],
+  )
+
+  const editSerie = useCallback(
+    (excercise, index, serie) => {
+      const newExcercises = workout?.excercises ?? []
+      const filtered = newExcercises.map(obj => {
+        if (obj.id !== excercise.id) return obj
+        const copy = { ...obj }
+        copy.sets[index] = serie
+        return copy
+      })
+      const newWorkout = { ...workout, excercises: filtered, date }
+
+      dispatch(editUserWorkout({ date, workout: newWorkout }))
+    },
+    [workout],
+  )
+
   const onStateChange = ({ open }) => setIsFabOpen(open)
 
   const addExcercisesButton = useMemo(() => {
@@ -55,13 +121,29 @@ const WorkoutContainer = ({ date = 21 }) => {
   }, [addExercises, selectedExcercises])
 
   return (
-    <Provider>
+    <View style={{ height: '100%' }}>
+      {/* <Provider> */}
+      <ScrollView style={[Layout.fill, Layout.column]}>
+        {workout?.excercises?.map(ex => (
+          <WorkoutExcercise
+            excercise={ex}
+            removeExercise={removeExercise}
+            addSerie={addSerie}
+            deleteSerie={deleteSerie}
+            editSerie={editSerie}
+          />
+          // <View>
+          //   <Text>{ex.name}</Text>
+          // </View>
+        ))}
+      </ScrollView>
       <Portal>
         <FAB.Group
           open={isFabOpen}
           variant={'surface'}
           visible
           icon={isFabOpen ? 'close' : 'plus'}
+          style={{ paddingBottom: 50 }}
           actions={[
             {
               icon: 'dumbbell',
@@ -76,14 +158,6 @@ const WorkoutContainer = ({ date = 21 }) => {
           ]}
           onStateChange={onStateChange}
         />
-
-        <View style={[Layout.fill, Layout.column]}>
-          {workout?.excercises?.map(ex => (
-            <View>
-              <Text>{ex.name}</Text>
-            </View>
-          ))}
-        </View>
         <Modal
           isVisible={isModalVisible}
           setVisible={setIsModalVisible}
@@ -95,7 +169,8 @@ const WorkoutContainer = ({ date = 21 }) => {
           />
         </Modal>
       </Portal>
-    </Provider>
+      {/* </Provider> */}
+    </View>
   )
 }
 
