@@ -9,11 +9,20 @@ import {
   Text,
   TextInput,
   Portal,
+  Chip,
+  Surface,
+  List,
+  TouchableRipple,
+  HelperText,
+  Appbar,
 } from 'react-native-paper'
 import { useCallback } from 'react'
 import { useState } from 'react'
 import Modal from './Modal'
 import { useMemo } from 'react'
+import NumberValue from './NumberValue'
+import { useDispatch } from 'react-redux'
+import { editUserExcerciseSerie } from '@/Store/User'
 const LeftContent = props => <IconButton {...props} icon="delete" />
 
 const WorkoutExcercise = ({
@@ -22,31 +31,80 @@ const WorkoutExcercise = ({
   mode,
   removeExercise,
   addSerie,
-  deleteSerie,
-  editSerie,
 }) => {
   const { Layout, Images } = useTheme()
 
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isModalErrorVisible, setIsModalErrorVisible] = useState(false)
   const [selectedSerie, setSelectedSerie] = useState()
   const [weight, setWeight] = useState(0)
   const [reps, setReps] = useState(0)
+  const dispatch = useDispatch()
+
+  const editSerie = useCallback(() => {
+    if (weight && reps) {
+      dispatch(
+        editUserExcerciseSerie({
+          date,
+          index: selectedSerie,
+          excercise,
+          serie: { weight, reps },
+        }),
+      )
+      setIsModalVisible(false)
+    } else setIsModalErrorVisible(true)
+  }, [date, selectedSerie, excercise, weight, reps])
+
+  const addSerieLocal = useCallback(() => {
+    if (weight && reps) {
+      addSerie(excercise, { weight, reps })
+      setIsModalVisible(false)
+    } else setIsModalErrorVisible(true)
+  }, [addSerie, excercise, weight, reps])
+
+  const removeSerie = useCallback(() => {
+    dispatch(
+      editUserExcerciseSerie({
+        date,
+        index: selectedSerie,
+        excercise,
+        serie: null,
+      }),
+    )
+    setIsModalVisible(false)
+  }, [date, excercise, selectedSerie])
 
   const saveSerie = useMemo(() => {
     return (
       <Button
         mode="text"
-        onPress={
-          selectedSerie
-            ? undefined
-            : () => addSerie(excercise, { weight, reps })
-        }
+        onPress={selectedSerie !== undefined ? editSerie : addSerieLocal}
         style={{ paddingHorizontal: 10, paddingVertical: 5 }}
       >
         Save
       </Button>
     )
-  }, [addSerie, selectedSerie])
+  }, [addSerie, selectedSerie, editSerie, addSerieLocal])
+
+  const openEditSerieModal = useCallback(
+    (serieWeight, serieReps, serieIndex) => {
+      setSelectedSerie(serieIndex)
+      setWeight(serieWeight)
+      setReps(serieReps)
+      setIsModalVisible(true)
+      setIsModalErrorVisible(false)
+    },
+    [],
+  )
+
+  const changeWeight = useCallback(text => {
+    setWeight(text)
+    setIsModalErrorVisible(false)
+  }, [])
+  const changeReps = useCallback(text => {
+    setReps(text)
+    setIsModalErrorVisible(false)
+  }, [])
 
   return (
     <Card style={{ marginVertical: 10 }}>
@@ -58,19 +116,35 @@ const WorkoutExcercise = ({
           icon="delete"
           onPress={() => removeExercise(excercise)}
         />
-        {excercise?.sets?.map((serie, i) => {
-          return (
-            <Text>
-              {serie.weight}
-              {serie.reps}
-            </Text>
-          )
-        })}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {excercise?.sets?.map((serie, i) => {
+            return (
+              <Surface
+                style={{ margin: 2, borderRadius: 10 }}
+                elevation={4}
+                key={excercise.name + i}
+              >
+                <TouchableRipple
+                  onPress={() =>
+                    openEditSerieModal(serie.weight, serie.reps, i)
+                  }
+                  rippleColor="green"
+                >
+                  <View style={{ flexDirection: 'column', padding: 20 }}>
+                    <NumberValue value={serie.weight} desc="KG" />
+                    <NumberValue value={serie.reps} desc="reps" />
+                  </View>
+                </TouchableRipple>
+              </Surface>
+            )
+          })}
+        </View>
         <Button
           icon="plus"
           mode="elevated"
           onPress={() => {
-            setSelectedSerie(null)
+            setSelectedSerie(undefined)
+            setIsModalErrorVisible(false)
             setIsModalVisible(true)
           }}
         >
@@ -82,22 +156,44 @@ const WorkoutExcercise = ({
             setVisible={setIsModalVisible}
             buttons={saveSerie}
           >
-            <TextInput
-              label="Weight"
-              value={weight}
-              onChangeText={text => setWeight(text)}
-              right={<Text>KG</Text>}
-              inputMode={'decimal'}
-              keyboardType={'decimal-pad'}
-            />
-            <TextInput
-              label="reps"
-              value={reps}
-              onChangeText={text => setReps(text)}
-              inputMode={'decimal'}
-              keyboardType={'decimal-pad'}
-            />
-            <Text>TUTAJ DODAWANJIE SERJI</Text>
+            <Appbar.Header>
+              <Appbar.BackAction
+                onPress={() => {
+                  setIsModalVisible(false)
+                }}
+              />
+              <Appbar.Content
+                title={`Set number ${
+                  selectedSerie !== undefined
+                    ? selectedSerie + 1
+                    : excercise?.sets?.length + 1
+                }`}
+              />
+              {selectedSerie !== undefined && (
+                <Appbar.Action icon="delete" onPress={removeSerie} />
+              )}
+            </Appbar.Header>
+            <View style={{ paddingHorizontal: 20 }}>
+              <TextInput
+                label="Weight"
+                value={weight}
+                onChangeText={changeWeight}
+                right={<TextInput.Affix text="KG" />}
+                inputMode={'decimal'}
+                keyboardType={'decimal-pad'}
+              />
+              <View style={{ padding: 5 }} />
+              <TextInput
+                label="reps"
+                value={reps}
+                onChangeText={changeReps}
+                inputMode={'decimal'}
+                keyboardType={'decimal-pad'}
+              />
+            </View>
+            <HelperText type="error" visible={isModalErrorVisible}>
+              Weight and reps cannot be equal 0!
+            </HelperText>
           </Modal>
         </Portal>
       </Card.Content>

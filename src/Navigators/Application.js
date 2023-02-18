@@ -1,12 +1,17 @@
 import React from 'react'
-import { SafeAreaView, StatusBar } from 'react-native'
+import { SafeAreaView, StatusBar, View } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native'
-import { ExampleContainer, StartupContainer } from '@/Containers'
+import {
+  AgendaContainer,
+  ExampleContainer,
+  StartupContainer,
+} from '@/Containers'
 import { useTheme } from '@/Hooks'
 import MainNavigator from './Main'
 import { navigationRef } from './utils'
 import { Provider } from 'react-native-paper'
+import KeyboardAvoidingView from 'react-native/Libraries/Components/Keyboard/KeyboardAvoidingView'
 
 const Stack = createStackNavigator()
 

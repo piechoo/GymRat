@@ -1,15 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import { View, StyleSheet, FlatList, Text, Modal, Button } from 'react-native'
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Text,
+  Modal,
+  Button,
+  Dimensions,
+} from 'react-native'
 
 import { bodyParts } from '@/Store/Excercises/consts'
 import ListItem from '@/Components/ListItem/ListItem'
 import { Agenda } from 'react-native-calendars'
 import WorkoutContainer from './WorkoutContainer'
+import { useCallback } from 'react'
+
+const { height } = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: 22,
+    height: height,
   },
   item: {
     padding: 10,
@@ -18,9 +28,13 @@ const styles = StyleSheet.create({
   },
 })
 
-const AgendaContainer = () => {
-  const [modalVisible, setModalVisible] = useState(false)
+const AgendaContainer = React.memo(() => {
   const [selectedDate, setSelectedDate] = useState(null)
+  console.log('agenda', selectedDate)
+
+  const onSelectDate = useCallback(day => {
+    setSelectedDate(day?.dateString)
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -28,32 +42,33 @@ const AgendaContainer = () => {
         // The list of items that have to be displayed in agenda. If you want to render item as empty date
         // the value of date key has to be an empty array []. If there exists no value for date key it is
         // considered that the date in question is not yet loaded
-        items={{
-          '2022-02-02': [{ name: 'item 1 - any js object' }],
-          '2023-02-02': [{ name: 'item 1 - any js object' }],
-          '2023-02-03': [{ name: 'item 2 - any js object', height: 80 }],
-          '2023-02-05': [
-            { name: 'item 3 - any js object' },
-            { name: 'any js object' },
-          ],
-          '2023-02-06': [
-            { name: 'item 3 - any js object' },
-            { name: 'any js object' },
-          ],
+        // items={{
+        //   '2022-02-02': [{ name: 'item 1 - any js object' }],
+        //   '2023-02-02': [{ name: 'item 1 - any js object' }],
+        //   '2023-02-03': [{ name: 'item 2 - any js object', height: 80 }],
+        //   '2023-02-05': [
+        //     { name: 'item 3 - any js object' },
+        //     { name: 'any js object' },
+        //   ],
+        //   '2023-02-06': [
+        //     { name: 'item 3 - any js object' },
+        //     { name: 'any js object' },
+        //   ],
 
-          '2023-02-08': [
-            { name: 'item 3 - any js object' },
-            { name: 'any js object' },
-          ],
-          '2023-02-09': [
-            { name: 'item 3 - any js object' },
-            { name: 'any js object' },
-          ],
-          '2023-02-10': [
-            { name: 'item 3 - any js object' },
-            { name: 'any js object' },
-          ],
-        }}
+        //   '2023-02-08': [
+        //     { name: 'item 3 - any js object' },
+        //     { name: 'any js object' },
+        //   ],
+        //   '2023-02-09': [
+        //     { name: 'item 3 - any js object' },
+        //     { name: 'any js object' },
+        //   ],
+        //   '2023-02-10': [
+        //     { name: 'item 3 - any js object' },
+        //     { name: 'any js object' },
+        //   ],
+        // }}
+        // selected={true}
         // renderEmptyDate={() => {
         //   console.log(selectedDate)
         //   return (
@@ -62,16 +77,15 @@ const AgendaContainer = () => {
         //     </View>
         //   )
         // }}
-        renderEmptyData={() => {
-          console.log(selectedDate)
-
-          return (
-            <View>
-              <WorkoutContainer date={selectedDate?.dateString} />
-              {/* <Text style={{ color: 'black' }}>DUPppA</Text> */}
-            </View>
-          )
-        }}
+        // renderEmptyData={() => {
+        //   console.log('empty')
+        //   return (
+        //     <View>
+        //       <WorkoutContainer date={selectedDate} />
+        //       {/* <Text style={{ color: 'black' }}>DUPppA</Text> */}
+        //     </View>
+        //   )
+        // }}
         // Callback that gets called when items for a certain month should be loaded (month became visible)
         // loadItemsForMonth={month => {
         //   console.log('trigger items loading')
@@ -81,9 +95,7 @@ const AgendaContainer = () => {
         //   console.log(calendarOpened)
         // }}
         // // Callback that gets called on day press
-        onDayPress={day => {
-          setSelectedDate(day)
-        }}
+        onDayPress={onSelectDate}
         // // Callback that gets called when day changes while scrolling agenda list
         // onDayChange={day => {
         //   console.log('day changed')
@@ -115,32 +127,43 @@ const AgendaContainer = () => {
         //   return <View />
         // }}
         // // Override inner list with a custom implemented component
-        // renderList={listProps => {
-        //   console.log(listProps.selectedDay.toString())
-        //   return (
-        //     <>
-        //       <FlatList
-        //         data={Object.values(listProps.items)}
-        //         renderItem={({ item }) =>
-        //           item.map(element => <ListItem item={element.name} />)
-        //         }
-        //       />
-        //       <Button title="Press me" onPress={() => setModalVisible(true)} />
-        //     </>
-        //   )
-        // }}
+        onCalendarToggled={() => {
+          console.log('TOGIELK')
+        }}
+        renderList={listProps => {
+          console.log('rener list')
+          console.log(listProps)
+          return (
+            <View>
+              <WorkoutContainer date={selectedDate} />
+            </View>
+            // <>
+            //   <FlatList
+            //     data={Object.values(listProps.items)}
+            //     renderItem={({ item }) =>
+            //       item.map(element => <ListItem item={element.name} />)
+            //     }
+            //   />
+            //   <Button title="Press me" onPress={() => setModalVisible(true)} />
+            // </>
+          )
+        }}
         // // Specify what should be rendered instead of ActivityIndicator
         // renderEmptyData={() => {
         //   return <View />
         // }}
         // // Specify your item comparison function for increased performance
         // rowHasChanged={(r1, r2) => {
+        //   console.log(r1)
         //   return r1.text !== r2.text
         // }}
+        selectedDay={Date.now()}
+        topDay={Date.now()}
         // // Hide knob button. Default = false
         // hideKnob={true}
-        // // When `true` and `hideKnob` prop is `false`, the knob will always be visible and the user will be able to drag the knob up and close the calendar. Default = false
-        // showClosingKnob={false}
+        // When `true` and `hideKnob` prop is `false`, the knob will always be visible and the user will be able to drag the knob up and close the calendar. Default = false
+        showClosingKnob={true}
+        disableVirtualization={true}
         // // By default, agenda dates are marked if they have at least one item, but you can override this if needed
         // markedDates={{
         //   '2012-05-16': { selected: true, marked: true },
@@ -166,21 +189,10 @@ const AgendaContainer = () => {
         // // Agenda container style
         // style={{}}
       />
-
-      <Modal
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(true)}
-      >
-        <View style={{ backgroundColor: 'rgba(0,0,0,0.4)', flex: 1 }}>
-          <View style={{ backgroundColor: 'orange', padding: 40, margin: 80 }}>
-            <Text>This is a modal</Text>
-            <Button title="close" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
     </View>
   )
-}
+})
+
+AgendaContainer.type.displayName = 'AgendaContainer'
 
 export default AgendaContainer

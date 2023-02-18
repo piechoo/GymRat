@@ -17,7 +17,7 @@ import { changeTheme } from '@/Store/Theme'
 import { getBodypartExcercises } from '@/Store/Excercises'
 import { bodyParts, excercises } from '@/Store/Excercises/consts'
 import ListItem from '@/Components/ListItem/ListItem'
-import { Appbar } from 'react-native-paper'
+import { Appbar, List } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
@@ -30,17 +30,27 @@ const styles = StyleSheet.create({
   },
 })
 
-const ExcercisesList = ({ setSelectedExcercises, selectedExcercises }) => {
+const ExcercisesList = ({
+  setSelectedExcercises,
+  selectedExcercises,
+  setIsModalVisible,
+}) => {
   const [selectedBodypart, setSelectedBodypart] = useState(null)
   const { t } = useTranslation()
 
   return (
     <View style={styles.container}>
       <Appbar.Header>
-        {selectedBodypart && (
+        {selectedBodypart ? (
           <Appbar.BackAction
             onPress={() => {
               setSelectedBodypart(null)
+            }}
+          />
+        ) : (
+          <Appbar.BackAction
+            onPress={() => {
+              setIsModalVisible(false)
             }}
           />
         )}
@@ -55,10 +65,18 @@ const ExcercisesList = ({ setSelectedExcercises, selectedExcercises }) => {
         <FlatList
           data={Object.values(bodyParts)}
           renderItem={({ item }) => (
-            <ListItem
-              item={item}
+            // <ListItem
+            //   item={item}
+            //   title={t(`bodyparts.${item}`)}
+            //   onClick={setSelectedBodypart}
+            // />
+            <List.Item
               title={t(`bodyparts.${item}`)}
-              onClick={setSelectedBodypart}
+              description={`${excercises[item]?.length} excercises`}
+              left={props => <List.Icon {...props} icon="folder" />}
+              onPress={() => {
+                setSelectedBodypart(item)
+              }}
             />
           )}
         />
@@ -67,18 +85,36 @@ const ExcercisesList = ({ setSelectedExcercises, selectedExcercises }) => {
         <FlatList
           data={excercises[selectedBodypart]}
           renderItem={({ item }) => (
-            <ListItem
-              item={item}
+            <List.Item
               title={item.name}
-              selected={!!selectedExcercises.find(el => el.name === item.name)}
-              onClick={item => {
-                console.log(selectedExcercises)
+              description={item.type}
+              left={props => <List.Icon {...props} icon="weight-lifter" />}
+              onPress={() => {
                 setSelectedExcercises(state => {
                   if (state.indexOf(item) === -1) return [...state, item]
-                  return state.filter(n => n.name !== item.name)
+                  return state.filter(n => n.id !== item.id)
                 })
               }}
+              style={{
+                backgroundColor: !!selectedExcercises.find(
+                  el => el.id === item.id,
+                )
+                  ? 'rgba(0, 0, 0, .32)'
+                  : undefined,
+              }}
             />
+            // <ListItem
+            // item={item}
+            // title={item.name}
+            // selected={!!selectedExcercises.find(el => el.name === item.name)}
+            // onClick={item => {
+            //   console.log(selectedExcercises)
+            //   setSelectedExcercises(state => {
+            //     if (state.indexOf(item) === -1) return [...state, item]
+            //     return state.filter(n => n.name !== item.name)
+            //   })
+            // }}
+            // />
           )}
         />
       )}

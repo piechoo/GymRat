@@ -21,6 +21,29 @@ const slice = createSlice({
       else
         state.workouts = state.workouts.filter(workout => workout.date !== date)
     },
+    editUserExcerciseSerie: (
+      state,
+      { payload: { index, excercise, date, serie } },
+    ) => {
+      state.workouts = state.workouts.map(obj => {
+        if (obj.date !== date) return obj
+        const newExcercises = obj?.excercises ?? []
+        const filtered = newExcercises.map(obj => {
+          if (obj.id !== excercise.id) return obj
+          if (serie) {
+            const copy = { ...obj }
+            copy.sets = [...copy.sets]
+            copy.sets[index] = serie
+            return copy
+          } else {
+            const copy = { ...obj }
+            copy.sets.splice(index, 1)
+            return copy
+          }
+        })
+        return { ...obj, excercises: filtered, date }
+      })
+    },
     addUserPlan: (state, { payload: { plan } }) => {
       state.plans.push(plan)
     },
@@ -50,6 +73,7 @@ export const {
   setUserHeight,
   setUserWeight,
   editUserWorkout,
+  editUserExcerciseSerie,
 } = slice.actions
 
 export default slice.reducer

@@ -10,11 +10,17 @@ import {
   Modal as PaperModal,
 } from 'react-native-paper'
 
-const Modal = memo(({ isVisible, setVisible, buttons, children }) => {
+const Modal = memo(({ isVisible, setVisible, buttons, stretch, children }) => {
   const hideModal = () => setVisible(false)
   const { Layout, Gutters, Fonts } = useTheme()
 
-  const containerStyle = { backgroundColor: 'white', margin: 20, flex: 1 }
+  const containerStyle = {
+    backgroundColor: 'white',
+    marginVertical: 80,
+    marginHorizontal: 30,
+    flex: stretch ? 1 : 0,
+    // height
+  }
 
   return (
     <Portal>

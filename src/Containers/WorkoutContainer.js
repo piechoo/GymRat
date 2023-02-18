@@ -19,7 +19,7 @@ import { defaultExcerciseValues } from '@/Store/Excercises/consts'
 import { useMemo } from 'react'
 import WorkoutExcercise from '@/Components/WorkoutExcercise'
 
-const WorkoutContainer = ({ date }) => {
+const WorkoutContainer = React.memo(({ date }) => {
   const { Layout, Gutters, Fonts } = useTheme()
   const workout = useSelector(state => getUserDayWorkout(state, date))
   const [isFabOpen, setIsFabOpen] = useState(false)
@@ -27,6 +27,7 @@ const WorkoutContainer = ({ date }) => {
   const [selectedExcercises, setSelectedExcercises] = useState(
     workout?.excercises ?? [],
   )
+  console.log(date)
 
   useEffect(() => {
     setSelectedExcercises(workout?.excercises ?? [])
@@ -35,11 +36,14 @@ const WorkoutContainer = ({ date }) => {
 
   const addExercises = useCallback(() => {
     const newExcercises = workout?.excercises ?? []
-    const filtered = newExcercises.filter(
-      obj => !selectedExcercises.find(o => o.name === obj.name),
+    // const filtered = newExcercises.filter(
+    //   obj => !selectedExcercises.find(o => o.name === obj.name),
+    // )
+    const filteredSelected = selectedExcercises.filter(
+      obj => !newExcercises.find(o => o.name === obj.name),
     )
-    const exercisesWithNew = filtered.concat(
-      selectedExcercises.map(ex => ({ ...ex, ...defaultExcerciseValues })),
+    const exercisesWithNew = newExcercises.concat(
+      filteredSelected.map(ex => ({ ...ex, ...defaultExcerciseValues })),
     )
     const newWorkout = { ...workout, excercises: exercisesWithNew, date }
     if (workout) dispatch(editUserWorkout({ date, workout: newWorkout }))
@@ -63,40 +67,7 @@ const WorkoutContainer = ({ date }) => {
       const filtered = newExcercises.map(obj => {
         if (obj.id !== excercise.id) return obj
         const copy = { ...obj }
-        console.log(copy)
         copy.sets = [...copy.sets, serie]
-        return copy
-      })
-      const newWorkout = { ...workout, excercises: filtered, date }
-
-      console.log(filtered)
-      dispatch(editUserWorkout({ date, workout: newWorkout }))
-    },
-    [workout],
-  )
-  const deleteSerie = useCallback(
-    (excercise, index) => {
-      const newExcercises = workout?.excercises ?? []
-      const filtered = newExcercises.map(obj => {
-        if (obj.id !== excercise.id) return obj
-        const copy = { ...obj }
-        copy.sets.splice(index, 1)
-        return copy
-      })
-      const newWorkout = { ...workout, excercises: filtered, date }
-
-      dispatch(editUserWorkout({ date, workout: newWorkout }))
-    },
-    [workout],
-  )
-
-  const editSerie = useCallback(
-    (excercise, index, serie) => {
-      const newExcercises = workout?.excercises ?? []
-      const filtered = newExcercises.map(obj => {
-        if (obj.id !== excercise.id) return obj
-        const copy = { ...obj }
-        copy.sets[index] = serie
         return copy
       })
       const newWorkout = { ...workout, excercises: filtered, date }
@@ -126,11 +97,11 @@ const WorkoutContainer = ({ date }) => {
       <ScrollView style={[Layout.fill, Layout.column]}>
         {workout?.excercises?.map(ex => (
           <WorkoutExcercise
+            date={date}
             excercise={ex}
             removeExercise={removeExercise}
             addSerie={addSerie}
-            deleteSerie={deleteSerie}
-            editSerie={editSerie}
+            key={ex.name}
           />
           // <View>
           //   <Text>{ex.name}</Text>
@@ -162,8 +133,10 @@ const WorkoutContainer = ({ date }) => {
           isVisible={isModalVisible}
           setVisible={setIsModalVisible}
           buttons={addExcercisesButton}
+          stretch
         >
           <ExcercisesList
+            setIsModalVisible={setIsModalVisible}
             setSelectedExcercises={setSelectedExcercises}
             selectedExcercises={selectedExcercises}
           />
@@ -172,6 +145,8 @@ const WorkoutContainer = ({ date }) => {
       {/* </Provider> */}
     </View>
   )
-}
+})
+
+WorkoutContainer.type.displayName = 'WorkoutContainer'
 
 export default WorkoutContainer
