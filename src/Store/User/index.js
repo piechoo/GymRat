@@ -61,10 +61,22 @@ const slice = createSlice({
 
 export const getUser = state => state.user
 export const getUserName = state => getUser(state).name
-export const getUserWorkouts = state => getUser(state)?.workouts
+export const getUserWorkouts = state => getUser(state)?.workouts ?? []
 export const getUserDayWorkout = (state, date) =>
   getUser(state)?.workouts.find(workout => workout.date === date)
-export const getUserPlans = state => getUser(state)?.plans
+export const getUserPlans = state => getUser(state)?.plans // czy to będzie?
+
+export const getUserExcerciseHistory = (state, excerciseId) => {
+  const workoutExcercises = getUserWorkouts(state).map(workout => {
+    let currentEx
+    if ((currentEx = workout.excercises.find(el => el?.id === excerciseId))) {
+      return { date: workout.date, excercise: currentEx }
+    }
+    return null
+  })
+
+  return workoutExcercises.filter(ex => ex !== null)
+}
 
 export const {
   addUserWorkout,

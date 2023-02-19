@@ -23,6 +23,7 @@ import { useMemo } from 'react'
 import NumberValue from './NumberValue'
 import { useDispatch } from 'react-redux'
 import { editUserExcerciseSerie } from '@/Store/User'
+import ExcerciseDetails from './ExcerciseDetails'
 const LeftContent = props => <IconButton {...props} icon="delete" />
 
 const WorkoutExcercise = ({
@@ -35,6 +36,7 @@ const WorkoutExcercise = ({
   const { Layout, Images } = useTheme()
 
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isInfoVisible, setIsInfoVisible] = useState(false)
   const [isModalErrorVisible, setIsModalErrorVisible] = useState(false)
   const [selectedSerie, setSelectedSerie] = useState()
   const [weight, setWeight] = useState(0)
@@ -48,7 +50,7 @@ const WorkoutExcercise = ({
           date,
           index: selectedSerie,
           excercise,
-          serie: { weight, reps },
+          serie: { weight: parseFloat(weight), reps: parseInt(reps) },
         }),
       )
       setIsModalVisible(false)
@@ -57,7 +59,7 @@ const WorkoutExcercise = ({
 
   const addSerieLocal = useCallback(() => {
     if (weight && reps) {
-      addSerie(excercise, { weight, reps })
+      addSerie(excercise, { weight: parseFloat(weight), reps: parseInt(reps) })
       setIsModalVisible(false)
     } else setIsModalErrorVisible(true)
   }, [addSerie, excercise, weight, reps])
@@ -109,7 +111,14 @@ const WorkoutExcercise = ({
   return (
     <Card style={{ marginVertical: 10 }}>
       <Card.Content>
-        <Text variant="titleLarge">{excercise.name}</Text>
+        <Text
+          variant="titleLarge"
+          onPress={() => {
+            setIsInfoVisible(true)
+          }}
+        >
+          {excercise.name}
+        </Text>
         <Text variant="bodyMedium">{excercise.type}</Text>
         <IconButton
           style={{ position: 'absolute', top: 5, right: 0 }}
@@ -132,7 +141,7 @@ const WorkoutExcercise = ({
                 >
                   <View style={{ flexDirection: 'column', padding: 20 }}>
                     <NumberValue value={serie.weight} desc="KG" />
-                    <NumberValue value={serie.reps} desc="reps" />
+                    <NumberValue value={serie.reps} desc="Reps" />
                   </View>
                 </TouchableRipple>
               </Surface>
@@ -176,7 +185,7 @@ const WorkoutExcercise = ({
             <View style={{ paddingHorizontal: 20 }}>
               <TextInput
                 label="Weight"
-                value={weight}
+                value={`${weight}`}
                 onChangeText={changeWeight}
                 right={<TextInput.Affix text="KG" />}
                 inputMode={'decimal'}
@@ -184,8 +193,8 @@ const WorkoutExcercise = ({
               />
               <View style={{ padding: 5 }} />
               <TextInput
-                label="reps"
-                value={reps}
+                label="Reps"
+                value={`${reps}`}
                 onChangeText={changeReps}
                 inputMode={'decimal'}
                 keyboardType={'decimal-pad'}
@@ -194,6 +203,22 @@ const WorkoutExcercise = ({
             <HelperText type="error" visible={isModalErrorVisible}>
               Weight and reps cannot be equal 0!
             </HelperText>
+          </Modal>
+
+          <Modal
+            isVisible={isInfoVisible}
+            setVisible={setIsInfoVisible}
+            buttons={saveSerie}
+          >
+            <Appbar.Header>
+              <Appbar.BackAction
+                onPress={() => {
+                  setIsInfoVisible(false)
+                }}
+              />
+              <Appbar.Content title={excercise.name} />
+            </Appbar.Header>
+            <ExcerciseDetails excerciseId={excercise.id} />
           </Modal>
         </Portal>
       </Card.Content>

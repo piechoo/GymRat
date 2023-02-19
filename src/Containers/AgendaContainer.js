@@ -30,8 +30,6 @@ const styles = StyleSheet.create({
 
 const AgendaContainer = React.memo(() => {
   const [selectedDate, setSelectedDate] = useState(null)
-  console.log('agenda', selectedDate)
-
   const onSelectDate = useCallback(day => {
     setSelectedDate(day?.dateString)
   }, [])
@@ -127,12 +125,8 @@ const AgendaContainer = React.memo(() => {
         //   return <View />
         // }}
         // // Override inner list with a custom implemented component
-        onCalendarToggled={() => {
-          console.log('TOGIELK')
-        }}
+
         renderList={listProps => {
-          console.log('rener list')
-          console.log(listProps)
           return (
             <View>
               <WorkoutContainer date={selectedDate} />
@@ -157,8 +151,8 @@ const AgendaContainer = React.memo(() => {
         //   console.log(r1)
         //   return r1.text !== r2.text
         // }}
-        selectedDay={Date.now()}
-        topDay={Date.now()}
+        // selectedDay={Date.now()}
+        // topDay={Date.now()}
         // // Hide knob button. Default = false
         // hideKnob={true}
         // When `true` and `hideKnob` prop is `false`, the knob will always be visible and the user will be able to drag the knob up and close the calendar. Default = false

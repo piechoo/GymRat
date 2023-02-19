@@ -27,7 +27,6 @@ const WorkoutContainer = React.memo(({ date }) => {
   const [selectedExcercises, setSelectedExcercises] = useState(
     workout?.excercises ?? [],
   )
-  console.log(date)
 
   useEffect(() => {
     setSelectedExcercises(workout?.excercises ?? [])
