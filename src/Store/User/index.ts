@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { AppState, ExcerciseHistory, User, Workout } from '../types'
 
 const slice = createSlice({
   name: 'user',
@@ -59,14 +60,15 @@ const slice = createSlice({
   },
 })
 
-export const getUser = state => state.user
-export const getUserName = state => getUser(state).name
-export const getUserWorkouts = state => getUser(state)?.workouts ?? []
-export const getUserDayWorkout = (state, date) =>
+export const getUser = (state:AppState):User => state.user
+export const getUserName = (state:AppState):string => getUser(state).name
+export const getUserWorkouts = (state:AppState):Workout[] => getUser(state)?.workouts ?? []
+export const getUserDayWorkout = (state:AppState, date:string):Workout =>
   getUser(state)?.workouts.find(workout => workout.date === date)
+
 export const getUserPlans = state => getUser(state)?.plans // czy to będzie?
 
-export const getUserExcerciseHistory = (state, excerciseId) => {
+export const getUserExcerciseHistory = (state, excerciseId):ExcerciseHistory[] => {
   const workoutExcercises = getUserWorkouts(state).map(workout => {
     let currentEx
     if ((currentEx = workout.excercises.find(el => el?.id === excerciseId))) {

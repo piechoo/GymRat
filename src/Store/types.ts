@@ -1,3 +1,5 @@
+    import { bodyParts } from './Excercises/consts'
+
     export interface Excercise {
         name: string;
         type: string;
@@ -5,14 +7,14 @@
     }
 
     export interface Excercises {
-        chest: Excercise[];
-        back: Excercise[];
-        legs: Excercise[];
-        shoulders: Excercise[];
-        cardio: Excercise[];
-        biceps: Excercise[];
-        triceps: Excercise[];
-        abs: Excercise[];
+        [bodyParts.chest]: Excercise[];
+        [bodyParts.back]: Excercise[];
+        [bodyParts.legs]: Excercise[];
+        [bodyParts.shoulders]: Excercise[];
+        [bodyParts.cardio]: Excercise[];
+        [bodyParts.biceps]: Excercise[];
+        [bodyParts.triceps]: Excercise[];
+        [bodyParts.abs]: Excercise[];
     }
 
         export interface Set {
@@ -33,10 +35,21 @@
         date: string;
     }
 
+     export interface ExcerciseHistory {
+        excercise: WorkoutExcercise;
+        date: string;
+    }
+
     export interface User {
         name: string;
         height: number;
         plans: any[];
         weight: any[];
         workouts: Workout[];
+    }
+
+    export interface AppState {
+        user:User,
+        excercises:Excercises
+
     }

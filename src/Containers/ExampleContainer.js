@@ -9,7 +9,6 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Brand } from '@/Components'
 import { useTheme } from '@/Hooks'
 import { changeTheme } from '@/Store/Theme'
 import {
@@ -19,6 +18,7 @@ import {
   setUserWeight,
 } from '@/Store/User'
 import { navigateAndSimpleReset } from '@/Navigators/utils'
+import Logo from '@/Components/Logo'
 
 const ExampleContainer = () => {
   const { t } = useTranslation()
@@ -39,7 +39,7 @@ const ExampleContainer = () => {
       contentContainerStyle={[Gutters.smallHPadding]}
     >
       <View style={[[Layout.colCenter, Gutters.smallHPadding]]}>
-        <Brand />
+        <Logo />
         <ActivityIndicator />
         <Text style={Fonts.textRegular}>
           {t('example.helloUser', { name: 'Gienio' })}

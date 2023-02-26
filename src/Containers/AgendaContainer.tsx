@@ -1,16 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  Text,
-  Modal,
-  Button,
-  Dimensions,
-} from 'react-native'
+import React, { useState } from 'react'
+import { View, StyleSheet, Dimensions } from 'react-native'
 
 import { bodyParts } from '@/Store/Excercises/consts'
-import ListItem from '@/Components/ListItem/ListItem'
 import { Agenda } from 'react-native-calendars'
 import WorkoutContainer from './WorkoutContainer'
 import { useCallback } from 'react'
@@ -187,6 +178,6 @@ const AgendaContainer = React.memo(() => {
   )
 })
 
-AgendaContainer.type.displayName = 'AgendaContainer'
+AgendaContainer.displayName = 'AgendaContainer'
 
 export default AgendaContainer

@@ -19,4 +19,17 @@ export default {
     abs: 'Abdominals',
     cardio: 'Cardio',
   },
+  workoutExcercise: {
+    addSerie: 'Add new serie',
+    addFromList: 'Add from list',
+    addFromDay: 'Add from day',
+    cantBeEmpty: 'Weight and reps cannot be equal 0!',
+    setNumber: 'Set number',
+    weight: 'Weight',
+    reps: 'Reps',
+  },
+  shared: {
+    save: 'Save',
+    add: 'Add',
+  },
 }

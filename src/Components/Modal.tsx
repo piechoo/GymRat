@@ -10,16 +10,23 @@ import {
   Modal as PaperModal,
 } from 'react-native-paper'
 
-const Modal = memo(({ isVisible, setVisible, buttons, stretch, children }) => {
+interface ModalProps {
+    isVisible: boolean;
+    setVisible: (arg:boolean)=>any;
+    buttons?:React.ReactElement;
+    shouldStretch?:boolean,
+    children:React.ReactElement
+}
+
+const Modal = memo(({ isVisible, setVisible, buttons, shouldStretch, children }:ModalProps) => {
   const hideModal = () => setVisible(false)
-  const { Layout, Gutters, Fonts } = useTheme()
+  const { Layout } = useTheme()
 
   const containerStyle = {
     backgroundColor: 'white',
     marginVertical: 80,
     marginHorizontal: 30,
-    flex: stretch ? 1 : 0,
-    // height
+    flex: shouldStretch ? 1 : 0,
   }
 
   return (
@@ -45,5 +52,5 @@ const Modal = memo(({ isVisible, setVisible, buttons, stretch, children }) => {
   )
 })
 
-Modal.type.displayName = 'Modal'
+Modal.displayName = 'Modal'
 export default Modal

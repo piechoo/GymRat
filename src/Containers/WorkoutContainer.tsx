@@ -1,16 +1,13 @@
 import React, { useEffect } from 'react'
-import { ActivityIndicator, View, Text, ScrollView } from 'react-native'
+import { View, ScrollView, StyleSheet } from 'react-native'
 import { useTheme } from '@/Hooks'
-import { Brand } from '@/Components'
-import { setDefaultTheme } from '@/Store/Theme'
-import { navigateAndSimpleReset } from '@/Navigators/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   addUserWorkout,
   editUserWorkout,
   getUserDayWorkout,
 } from '@/Store/User'
-import { Button, FAB, Portal, Provider } from 'react-native-paper'
+import { Button, FAB, Portal } from 'react-native-paper'
 import { useState } from 'react'
 import Modal from '@/Components/Modal'
 import ExcercisesList from './ExcercisesList'
@@ -18,10 +15,26 @@ import { useCallback } from 'react'
 import { defaultExcerciseValues } from '@/Store/Excercises/consts'
 import { useMemo } from 'react'
 import WorkoutExcercise from '@/Components/WorkoutExcercise'
+import { AppState } from '@/Store/types'
+import { useTranslation } from 'react-i18next'
 
-const WorkoutContainer = React.memo(({ date }) => {
-  const { Layout, Gutters, Fonts } = useTheme()
-  const workout = useSelector(state => getUserDayWorkout(state, date))
+interface Props {
+  date: string
+}
+
+const styles = StyleSheet.create({
+  addButton: { paddingHorizontal: 10, paddingVertical: 5 },
+  container: { height: '100%' },
+  fabGroup: { paddingBottom: 50 },
+})
+
+const WorkoutContainer = React.memo(({ date }: Props) => {
+  const { Layout } = useTheme()
+  const { t } = useTranslation()
+
+  const workout = useSelector((state: AppState) =>
+    getUserDayWorkout(state, date),
+  )
   const [isFabOpen, setIsFabOpen] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [selectedExcercises, setSelectedExcercises] = useState(
@@ -35,9 +48,6 @@ const WorkoutContainer = React.memo(({ date }) => {
 
   const addExercises = useCallback(() => {
     const newExcercises = workout?.excercises ?? []
-    // const filtered = newExcercises.filter(
-    //   obj => !selectedExcercises.find(o => o.name === obj.name),
-    // )
     const filteredSelected = selectedExcercises.filter(
       obj => !newExcercises.find(o => o.name === obj.name),
     )
@@ -80,19 +90,14 @@ const WorkoutContainer = React.memo(({ date }) => {
 
   const addExcercisesButton = useMemo(() => {
     return selectedExcercises ? (
-      <Button
-        mode="text"
-        onPress={addExercises}
-        style={{ paddingHorizontal: 10, paddingVertical: 5 }}
-      >
-        Add
+      <Button mode="text" onPress={addExercises} style={styles.addButton}>
+        {t(`shared.add`)}
       </Button>
     ) : undefined
   }, [addExercises, selectedExcercises])
 
   return (
-    <View style={{ height: '100%' }}>
-      {/* <Provider> */}
+    <View style={styles.container}>
       <ScrollView style={[Layout.fill, Layout.column]}>
         {workout?.excercises?.map(ex => (
           <WorkoutExcercise
@@ -102,9 +107,6 @@ const WorkoutContainer = React.memo(({ date }) => {
             addSerie={addSerie}
             key={ex.name}
           />
-          // <View>
-          //   <Text>{ex.name}</Text>
-          // </View>
         ))}
       </ScrollView>
       <Portal>
@@ -113,16 +115,16 @@ const WorkoutContainer = React.memo(({ date }) => {
           variant={'surface'}
           visible
           icon={isFabOpen ? 'close' : 'plus'}
-          style={{ paddingBottom: 50 }}
+          style={styles.fabGroup}
           actions={[
             {
               icon: 'dumbbell',
-              label: 'Add from list',
+              label: t(`workoutExcercise.addFromList`),
               onPress: () => setIsModalVisible(true),
             },
             {
               icon: 'calendar-blank-multiple',
-              label: 'Add from day',
+              label: t(`workoutExcercise.addFromDay`),
               onPress: () => console.log('Pressed star'),
             },
           ]}
@@ -132,7 +134,7 @@ const WorkoutContainer = React.memo(({ date }) => {
           isVisible={isModalVisible}
           setVisible={setIsModalVisible}
           buttons={addExcercisesButton}
-          stretch
+          shouldStretch
         >
           <ExcercisesList
             setIsModalVisible={setIsModalVisible}
@@ -141,11 +143,10 @@ const WorkoutContainer = React.memo(({ date }) => {
           />
         </Modal>
       </Portal>
-      {/* </Provider> */}
     </View>
   )
 })
 
-WorkoutContainer.type.displayName = 'WorkoutContainer'
+WorkoutContainer.displayName = 'WorkoutContainer'
 
 export default WorkoutContainer

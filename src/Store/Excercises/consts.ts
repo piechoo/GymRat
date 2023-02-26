@@ -6,15 +6,15 @@ const execiseType = {
 export const defaultExcerciseValues = {
   sets: [],
 }
-export const bodyParts = {
-  chest: 'chest',
-  back: 'back',
-  legs: 'legs',
-  shoulders: 'shoulders',
-  biceps: 'biceps',
-  triceps: 'triceps',
-  abs: 'abs',
-  cardio: 'cardio',
+export enum bodyParts {
+  chest= 'chest',
+  back= 'back',
+  legs= 'legs',
+  shoulders='shoulders',
+  biceps= 'biceps',
+  triceps= 'triceps',
+  abs= 'abs',
+  cardio= 'cardio',
 }
 export const excercises = {
   [bodyParts.chest]: [

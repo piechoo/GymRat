@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { View, Image } from 'react-native'
-import { useTheme } from '@/Hooks'
+import { StyleSheet, View } from 'react-native'
 import {
   IconButton,
   Button,
@@ -9,9 +8,7 @@ import {
   Text,
   TextInput,
   Portal,
-  Chip,
   Surface,
-  List,
   TouchableRipple,
   HelperText,
   Appbar,
@@ -24,24 +21,41 @@ import NumberValue from './NumberValue'
 import { useDispatch } from 'react-redux'
 import { editUserExcerciseSerie } from '@/Store/User'
 import ExcerciseDetails from './ExcerciseDetails'
-const LeftContent = props => <IconButton {...props} icon="delete" />
+import { useTranslation } from 'react-i18next'
+import { WorkoutExcercise, Set } from '@/Store/types'
+
+interface Props {
+  excercise: WorkoutExcercise
+  date: string
+  removeExercise: (ex: WorkoutExcercise) => any
+  addSerie: (ex: WorkoutExcercise, serie: Set) => any
+}
+
+const styles = StyleSheet.create({
+  saveButton: { paddingHorizontal: 10, paddingVertical: 5 },
+  card: { marginVertical: 10 },
+  delete: { position: 'absolute', top: 5, right: 0 },
+  content: { flexDirection: 'row', flexWrap: 'wrap' },
+  surface: { margin: 2, borderRadius: 10 },
+  setButton: { flexDirection: 'column', padding: 20 },
+  modalContent: { paddingHorizontal: 20 },
+  divider: { padding: 5 },
+})
 
 const WorkoutExcercise = ({
   excercise,
   date,
-  mode,
   removeExercise,
   addSerie,
-}) => {
-  const { Layout, Images } = useTheme()
-
+}: Props) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [isInfoVisible, setIsInfoVisible] = useState(false)
   const [isModalErrorVisible, setIsModalErrorVisible] = useState(false)
-  const [selectedSerie, setSelectedSerie] = useState()
-  const [weight, setWeight] = useState(0)
-  const [reps, setReps] = useState(0)
+  const [selectedSerie, setSelectedSerie] = useState(null)
+  const [weight, setWeight] = useState('0')
+  const [reps, setReps] = useState('0')
   const dispatch = useDispatch()
+  const { t } = useTranslation()
 
   const editSerie = useCallback(() => {
     if (weight && reps) {
@@ -80,10 +94,10 @@ const WorkoutExcercise = ({
     return (
       <Button
         mode="text"
-        onPress={selectedSerie !== undefined ? editSerie : addSerieLocal}
-        style={{ paddingHorizontal: 10, paddingVertical: 5 }}
+        onPress={selectedSerie !== null ? editSerie : addSerieLocal}
+        style={styles.saveButton}
       >
-        Save
+        {t(`shared.save`)}
       </Button>
     )
   }, [addSerie, selectedSerie, editSerie, addSerieLocal])
@@ -109,7 +123,7 @@ const WorkoutExcercise = ({
   }, [])
 
   return (
-    <Card style={{ marginVertical: 10 }}>
+    <Card style={styles.card}>
       <Card.Content>
         <Text
           variant="titleLarge"
@@ -121,15 +135,15 @@ const WorkoutExcercise = ({
         </Text>
         <Text variant="bodyMedium">{excercise.type}</Text>
         <IconButton
-          style={{ position: 'absolute', top: 5, right: 0 }}
+          style={styles.delete}
           icon="delete"
           onPress={() => removeExercise(excercise)}
         />
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        <View style={styles.content}>
           {excercise?.sets?.map((serie, i) => {
             return (
               <Surface
-                style={{ margin: 2, borderRadius: 10 }}
+                style={styles.surface}
                 elevation={4}
                 key={excercise.name + i}
               >
@@ -139,7 +153,7 @@ const WorkoutExcercise = ({
                   }
                   rippleColor="green"
                 >
-                  <View style={{ flexDirection: 'column', padding: 20 }}>
+                  <View style={styles.setButton}>
                     <NumberValue value={serie.weight} desc="KG" />
                     <NumberValue value={serie.reps} desc="Reps" />
                   </View>
@@ -152,12 +166,12 @@ const WorkoutExcercise = ({
           icon="plus"
           mode="elevated"
           onPress={() => {
-            setSelectedSerie(undefined)
+            setSelectedSerie(null)
             setIsModalErrorVisible(false)
             setIsModalVisible(true)
           }}
         >
-          Add new serie
+          {t(`workoutExcercise.addSerie`)}
         </Button>
         <Portal>
           <Modal
@@ -165,44 +179,46 @@ const WorkoutExcercise = ({
             setVisible={setIsModalVisible}
             buttons={saveSerie}
           >
-            <Appbar.Header>
-              <Appbar.BackAction
-                onPress={() => {
-                  setIsModalVisible(false)
-                }}
-              />
-              <Appbar.Content
-                title={`Set number ${
-                  selectedSerie !== undefined
-                    ? selectedSerie + 1
-                    : excercise?.sets?.length + 1
-                }`}
-              />
-              {selectedSerie !== undefined && (
-                <Appbar.Action icon="delete" onPress={removeSerie} />
-              )}
-            </Appbar.Header>
-            <View style={{ paddingHorizontal: 20 }}>
-              <TextInput
-                label="Weight"
-                value={`${weight}`}
-                onChangeText={changeWeight}
-                right={<TextInput.Affix text="KG" />}
-                inputMode={'decimal'}
-                keyboardType={'decimal-pad'}
-              />
-              <View style={{ padding: 5 }} />
-              <TextInput
-                label="Reps"
-                value={`${reps}`}
-                onChangeText={changeReps}
-                inputMode={'decimal'}
-                keyboardType={'decimal-pad'}
-              />
-            </View>
-            <HelperText type="error" visible={isModalErrorVisible}>
-              Weight and reps cannot be equal 0!
-            </HelperText>
+            <>
+              <Appbar.Header>
+                <Appbar.BackAction
+                  onPress={() => {
+                    setIsModalVisible(false)
+                  }}
+                />
+                <Appbar.Content
+                  title={`${t(`workoutExcercise.setEmpty`)} ${
+                    selectedSerie !== null
+                      ? selectedSerie + 1
+                      : excercise?.sets?.length + 1
+                  }`}
+                />
+                {selectedSerie !== null && (
+                  <Appbar.Action icon="delete" onPress={removeSerie} />
+                )}
+              </Appbar.Header>
+              <View style={styles.modalContent}>
+                <TextInput
+                  label={t(`workoutExcercise.weight`)}
+                  value={`${weight}`}
+                  onChangeText={changeWeight}
+                  right={<TextInput.Affix text="KG" />}
+                  inputMode={'decimal'}
+                  keyboardType={'decimal-pad'}
+                />
+                <View style={styles.divider} />
+                <TextInput
+                  label={t(`workoutExcercise.reps`)}
+                  value={`${reps}`}
+                  onChangeText={changeReps}
+                  inputMode={'decimal'}
+                  keyboardType={'decimal-pad'}
+                />
+              </View>
+              <HelperText type="error" visible={isModalErrorVisible}>
+                {t(`workoutExcercise.cantBeEmpty`)}
+              </HelperText>
+            </>
           </Modal>
 
           <Modal
@@ -210,31 +226,22 @@ const WorkoutExcercise = ({
             setVisible={setIsInfoVisible}
             buttons={saveSerie}
           >
-            <Appbar.Header>
-              <Appbar.BackAction
-                onPress={() => {
-                  setIsInfoVisible(false)
-                }}
-              />
-              <Appbar.Content title={excercise.name} />
-            </Appbar.Header>
-            <ExcerciseDetails excerciseId={excercise.id} />
+            <>
+              <Appbar.Header>
+                <Appbar.BackAction
+                  onPress={() => {
+                    setIsInfoVisible(false)
+                  }}
+                />
+                <Appbar.Content title={excercise.name} />
+              </Appbar.Header>
+              <ExcerciseDetails excerciseId={excercise.id} />
+            </>
           </Modal>
         </Portal>
       </Card.Content>
-      {/* <Card.Cover source={{ uri: 'https://picsum.photos/700' }} /> */}
-      {/* <Card.Actions>
-        <Button>Cancel</Button>
-        <Button>Ok</Button>
-      </Card.Actions> */}
     </Card>
   )
-}
-
-WorkoutExcercise.propTypes = {
-  height: PropTypes.number,
-  mode: PropTypes.oneOf(['contain', 'cover', 'stretch', 'repeat', 'center']),
-  width: PropTypes.number,
 }
 
 export default WorkoutExcercise

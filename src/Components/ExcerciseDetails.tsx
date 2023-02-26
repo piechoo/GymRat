@@ -1,32 +1,17 @@
+import React from 'react'
 import { getUserExcerciseHistory } from '@/Store/User'
-import * as React from 'react'
 import { useMemo } from 'react'
 import { memo } from 'react'
-import { Dimensions, View } from 'react-native'
+import { Dimensions, Text, View } from 'react-native'
 import { LineChart } from 'react-native-chart-kit'
-import {
-  Portal,
-  Text,
-  Button,
-  Provider,
-  Modal as PaperModal,
-} from 'react-native-paper'
 import { useSelector } from 'react-redux'
 import { useTheme } from 'react-native-paper'
 
-// const data = {
-//   labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-//   datasets: [
-//     {
-//       data: [20, 45, 28, 80, 99, 43],
-//       color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-//       strokeWidth: 2, // optional
-//     },
-//   ],
-//   legend: ['Rainy Days'], // optional
-// }
+interface Props {
+  excerciseId: number
+}
 
-const ExcerciseDetails = memo(({ excerciseId }) => {
+const ExcerciseDetails = memo(({ excerciseId }: Props) => {
   const historicalExcrecises = useSelector(state =>
     getUserExcerciseHistory(state, excerciseId),
   )
@@ -38,7 +23,7 @@ const ExcerciseDetails = memo(({ excerciseId }) => {
     const values = []
 
     const sortedByDate = historicalExcrecises.sort(
-      (a, b) => new Date(a.date) - new Date(b.date),
+      (a, b) => +new Date(a.date) - +new Date(b.date),
     )
     sortedByDate.map(ex => {
       labels.push(ex.date)
@@ -61,7 +46,7 @@ const ExcerciseDetails = memo(({ excerciseId }) => {
         },
       ],
       legend: ['Weight (KG)'], // optional
-      oneRepMax: parseFloat(oneRepMax).toFixed(2),
+      oneRepMax: parseFloat(`{$oneRepMax}`).toFixed(2),
     }
   }, [historicalExcrecises])
 
@@ -109,5 +94,5 @@ const ExcerciseDetails = memo(({ excerciseId }) => {
   )
 })
 
-ExcerciseDetails.type.displayName = 'ExcerciseDetails'
+ExcerciseDetails.displayName = 'ExcerciseDetails'
 export default ExcerciseDetails

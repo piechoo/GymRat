@@ -100,14 +100,14 @@ const mergeVariables = (variables, themeConfig, darkThemeConfig) =>
  * @param baseTheme
  * @param themeConfig
  * @param darkThemeConfig
- * @return {{[p: string]: *, NavigationTheme: {colors}, darkMode: *}}
+ * @return {{[p: string]: *, NavigationTheme: {dark, colors}, darkMode: *}}
  */
 const buildTheme = (darkMode, baseTheme, themeConfig, darkThemeConfig) => {
   return {
     ...mergeTheme(baseTheme, themeConfig, darkThemeConfig),
     darkMode,
     NavigationTheme: mergeNavigationTheme(
-      darkMode ? DarkTheme : DefaultTheme,
+      dark ? DarkTheme : DefaultTheme,
       baseTheme.NavigationColors,
     ),
   }
@@ -140,7 +140,7 @@ const mergeTheme = (baseTheme, theme, darkTheme) => ({
  *
  * @param reactNavigationTheme
  * @param overrideColors
- * @return {{colors}}
+ * @return {dark:boolean,{colors}}
  */
 const mergeNavigationTheme = (reactNavigationTheme, overrideColors) => ({
   ...reactNavigationTheme,
