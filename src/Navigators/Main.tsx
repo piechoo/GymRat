@@ -6,13 +6,13 @@ import {
   ExcercisesListContainer,
   WorkoutContainer,
 } from '@/Containers'
-import { Authentication } from '@/Components/Authentication/Authentication'
 import { View } from 'react-native'
+import { ProfileContainer } from '../Containers/ProfileContainer'
 
 const Tab = createBottomTabNavigator()
 
 // @refresh reset
-const MainNavigator = () => {
+const MainNavigator = ({ navigation }) => {
   return (
     <View
       style={{
@@ -21,25 +21,26 @@ const MainNavigator = () => {
       }}
     >
       <Tab.Navigator>
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Home"
           component={ExampleContainer}
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',
           }}
-        />
-        <Tab.Screen
-          name="Login"
-          component={Authentication}
+        /> */}
+
+        {/* <Tab.Screen
+          name="Bodyparts"
+          component={ExcercisesListContainer}
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',
           }}
-        />
+        /> */}
         <Tab.Screen
-          name="Bodyparts"
-          component={ExcercisesListContainer}
+          name="Feed"
+          component={WorkoutContainer}
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',
@@ -54,8 +55,8 @@ const MainNavigator = () => {
           }}
         />
         <Tab.Screen
-          name="Workout"
-          component={WorkoutContainer}
+          name="Profile"
+          component={ProfileContainer}
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',

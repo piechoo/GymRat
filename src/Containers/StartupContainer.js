@@ -18,7 +18,7 @@ const StartupContainer = () => {
       }, 2000),
     )
     setDefaultTheme({ theme: 'default', darkMode: null })
-    navigateAndSimpleReset('Login')
+    navigateAndSimpleReset('Main')
   }
 
   useEffect(() => {

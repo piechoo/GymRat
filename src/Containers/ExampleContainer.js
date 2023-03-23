@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import {
   View,
   ActivityIndicator,
@@ -19,6 +19,7 @@ import {
 } from '@/Store/User'
 import { navigateAndSimpleReset } from '@/Navigators/utils'
 import Logo from '@/Components/Logo'
+import { AuthContext } from '../Components/Authentication/AuthProvider'
 
 const ExampleContainer = () => {
   const { t } = useTranslation()
@@ -32,6 +33,8 @@ const ExampleContainer = () => {
   }
 
   const userName = useSelector(getUserName)
+  const { user, logout } = useContext(AuthContext)
+  console.log(user)
 
   return (
     <ScrollView
@@ -58,7 +61,7 @@ const ExampleContainer = () => {
         </Text>
         <TextInput
           onChangeText={name => dispatch(setUserName(name))}
-          value={userName}
+          value={user.displayName}
           selectTextOnFocus
           style={[Common.textInput]}
         />
@@ -92,6 +95,16 @@ const ExampleContainer = () => {
         onPress={() => navigateAndSimpleReset('Main')}
       >
         <Text style={Fonts.textRegular}>Zaloguj</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[Common.button.rounded, Gutters.regularVMargin]}
+        onPress={() => {
+          logout?.()
+          navigateAndSimpleReset('Login')
+        }}
+      >
+        <Text style={Fonts.textRegular}>Wyloguj</Text>
       </TouchableOpacity>
 
       {/* <TouchableOpacity

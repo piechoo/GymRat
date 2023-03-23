@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, Dimensions } from 'react-native'
 
 import { bodyParts } from '@/Store/Excercises/consts'
 import { Agenda } from 'react-native-calendars'
 import WorkoutContainer from './WorkoutContainer'
 import { useCallback } from 'react'
+import { Portal, Provider } from 'react-native-paper'
+import { useFocusEffect } from '@react-navigation/native'
 
 const { height } = Dimensions.get('window')
 
@@ -19,14 +21,34 @@ const styles = StyleSheet.create({
   },
 })
 
-const AgendaContainer = React.memo(() => {
+const AgendaContainer = React.memo(({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(null)
+  const [displayFab, setDisplayFab] = useState(false)
   const onSelectDate = useCallback(day => {
     setSelectedDate(day?.dateString)
   }, [])
+  // useEffect(() => {
+  //   navigation.addListener('focus', () => {
+  //     setDisplayFab(true)
+  //     console.log('sraka')
+  //   })
+  // }, [navigation])
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setDisplayFab(true)
+
+      return () => {
+        console.log('FOCUSOUT')
+        setDisplayFab(false)
+      }
+    }, []),
+  )
 
   return (
     <View style={styles.container}>
+      {/* <Provider>
+        <Portal.Host> */}
       <Agenda
         // The list of items that have to be displayed in agenda. If you want to render item as empty date
         // the value of date key has to be an empty array []. If there exists no value for date key it is
@@ -120,7 +142,7 @@ const AgendaContainer = React.memo(() => {
         renderList={listProps => {
           return (
             <View>
-              <WorkoutContainer date={selectedDate} />
+              <WorkoutContainer date={selectedDate} displayFab={displayFab} />
             </View>
             // <>
             //   <FlatList
@@ -174,6 +196,8 @@ const AgendaContainer = React.memo(() => {
         // // Agenda container style
         // style={{}}
       />
+      {/* </Portal.Host>
+      </Provider> */}
     </View>
   )
 })

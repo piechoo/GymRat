@@ -5,6 +5,6 @@
  */
 export default function () {
   return {
-    logo: require('@/Assets/Images/gymRat.png'),
+    logo: require('@/Assets/Images/simpleratlogo.svg'),
   }
 }

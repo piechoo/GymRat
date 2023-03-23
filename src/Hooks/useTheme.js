@@ -107,7 +107,7 @@ const buildTheme = (darkMode, baseTheme, themeConfig, darkThemeConfig) => {
     ...mergeTheme(baseTheme, themeConfig, darkThemeConfig),
     darkMode,
     NavigationTheme: mergeNavigationTheme(
-      dark ? DarkTheme : DefaultTheme,
+      darkMode ? DarkTheme : DefaultTheme,
       baseTheme.NavigationColors,
     ),
   }

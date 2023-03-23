@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { StyleSheet, View } from 'react-native'
 import {
   IconButton,
-  Button,
   Card,
   Text,
   TextInput,
@@ -22,22 +21,23 @@ import { useDispatch } from 'react-redux'
 import { editUserExcerciseSerie } from '@/Store/User'
 import ExcerciseDetails from './ExcerciseDetails'
 import { useTranslation } from 'react-i18next'
-import { WorkoutExcercise, Set } from '@/Store/types'
+import { WorkoutExcercise as WorkoutExcerciseType, Set } from '@/Store/types'
+import Button from './Button'
 
 interface Props {
-  excercise: WorkoutExcercise
+  excercise: WorkoutExcerciseType
   date: string
-  removeExercise: (ex: WorkoutExcercise) => any
-  addSerie: (ex: WorkoutExcercise, serie: Set) => any
+  removeExercise: (ex: WorkoutExcerciseType) => any
+  addSerie: (ex: WorkoutExcerciseType, serie: Set) => any
 }
 
 const styles = StyleSheet.create({
   saveButton: { paddingHorizontal: 10, paddingVertical: 5 },
-  card: { marginVertical: 10 },
+  card: { marginVertical: 10, marginHorizontal: 5 },
   delete: { position: 'absolute', top: 5, right: 0 },
   content: { flexDirection: 'row', flexWrap: 'wrap' },
   surface: { margin: 2, borderRadius: 10 },
-  setButton: { flexDirection: 'column', padding: 20 },
+  setButton: { flexDirection: 'column', padding: 5, borderRadius: 10 },
   modalContent: { paddingHorizontal: 20 },
   divider: { padding: 5 },
 })
@@ -95,7 +95,7 @@ const WorkoutExcercise = ({
       <Button
         mode="text"
         onPress={selectedSerie !== null ? editSerie : addSerieLocal}
-        style={styles.saveButton}
+        fullWidth={false}
       >
         {t(`shared.save`)}
       </Button>
@@ -144,14 +144,16 @@ const WorkoutExcercise = ({
             return (
               <Surface
                 style={styles.surface}
-                elevation={4}
+                elevation={1}
                 key={excercise.name + i}
               >
                 <TouchableRipple
                   onPress={() =>
                     openEditSerieModal(serie.weight, serie.reps, i)
                   }
-                  rippleColor="green"
+                  style={{ padding: 20, borderRadius: 10 }}
+                  rippleColor="#474747"
+                  borderless
                 >
                   <View style={styles.setButton}>
                     <NumberValue value={serie.weight} desc="KG" />

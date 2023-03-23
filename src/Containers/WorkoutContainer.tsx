@@ -14,12 +14,13 @@ import ExcercisesList from './ExcercisesList'
 import { useCallback } from 'react'
 import { defaultExcerciseValues } from '@/Store/Excercises/consts'
 import { useMemo } from 'react'
-import WorkoutExcercise from '@/Components/WorkoutExcercise'
 import { AppState } from '@/Store/types'
 import { useTranslation } from 'react-i18next'
+import WorkoutExcercise from '../Components/WorkoutExcercise'
 
 interface Props {
   date: string
+  displayFab: boolean
 }
 
 const styles = StyleSheet.create({
@@ -28,7 +29,8 @@ const styles = StyleSheet.create({
   fabGroup: { paddingBottom: 50 },
 })
 
-const WorkoutContainer = React.memo(({ date }: Props) => {
+const WorkoutContainer = React.memo(({ date, displayFab }: Props) => {
+  console.log('displayfab', displayFab)
   const { Layout } = useTheme()
   const { t } = useTranslation()
 
@@ -113,7 +115,7 @@ const WorkoutContainer = React.memo(({ date }: Props) => {
         <FAB.Group
           open={isFabOpen}
           variant={'surface'}
-          visible
+          visible={displayFab}
           icon={isFabOpen ? 'close' : 'plus'}
           style={styles.fabGroup}
           actions={[
@@ -127,9 +129,15 @@ const WorkoutContainer = React.memo(({ date }: Props) => {
               label: t(`workoutExcercise.addFromDay`),
               onPress: () => console.log('Pressed star'),
             },
+            {
+              icon: 'account-multiple-plus',
+              label: t(`Add a friend`),
+              onPress: () => console.log('Pressed star'),
+            },
           ]}
           onStateChange={onStateChange}
         />
+
         <Modal
           isVisible={isModalVisible}
           setVisible={setIsModalVisible}
