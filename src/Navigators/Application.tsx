@@ -11,6 +11,7 @@ import auth from '@react-native-firebase/auth'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import AuthStack from './AuthStack'
 import EditProfileScreen from '../Containers/EditProfileContainer'
+import { WorkoutContainer } from '../Containers'
 
 const Stack = createStackNavigator()
 
@@ -54,6 +55,13 @@ const ApplicationNavigator = () => {
               <Stack.Screen
                 name="EditProfile"
                 component={EditProfileScreen}
+                options={{
+                  animationEnabled: false,
+                }}
+              />
+              <Stack.Screen
+                name="WorkoutCreator"
+                component={WorkoutContainer}
                 options={{
                   animationEnabled: false,
                 }}

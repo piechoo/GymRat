@@ -24,12 +24,12 @@ import { useTranslation } from 'react-i18next'
 import { WorkoutExcercise as WorkoutExcerciseType, Set } from '@/Store/types'
 import Button from './Button'
 
-interface Props {
-  excercise: WorkoutExcerciseType
-  date: string
-  removeExercise: (ex: WorkoutExcerciseType) => any
-  addSerie: (ex: WorkoutExcerciseType, serie: Set) => any
-}
+// interface Props {
+//   excercise: WorkoutExcerciseType
+//   date: string
+//   removeExercise: (ex: WorkoutExcerciseType) => any
+//   addSerie: (ex: WorkoutExcerciseType, serie: Set) => any
+// }
 
 const styles = StyleSheet.create({
   saveButton: { paddingHorizontal: 10, paddingVertical: 5 },
@@ -44,8 +44,10 @@ const styles = StyleSheet.create({
 
 const WorkoutExcercise = ({
   excercise,
-  date,
+  date = '123',
   removeExercise,
+  editSerie,
+  removeSerie,
   addSerie,
 }: Props) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -57,19 +59,17 @@ const WorkoutExcercise = ({
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
-  const editSerie = useCallback(() => {
+  const editSerieLocal = useCallback(() => {
     if (weight && reps) {
-      dispatch(
-        editUserExcerciseSerie({
-          date,
-          index: selectedSerie,
-          excercise,
-          serie: { weight: parseFloat(weight), reps: parseInt(reps) },
-        }),
+      editSerie(
+        excercise,
+        { weight: parseFloat(weight), reps: parseInt(reps) },
+        selectedSerie,
       )
+
       setIsModalVisible(false)
     } else setIsModalErrorVisible(true)
-  }, [date, selectedSerie, excercise, weight, reps])
+  }, [selectedSerie, excercise, weight, reps])
 
   const addSerieLocal = useCallback(() => {
     if (weight && reps) {
@@ -78,29 +78,22 @@ const WorkoutExcercise = ({
     } else setIsModalErrorVisible(true)
   }, [addSerie, excercise, weight, reps])
 
-  const removeSerie = useCallback(() => {
-    dispatch(
-      editUserExcerciseSerie({
-        date,
-        index: selectedSerie,
-        excercise,
-        serie: null,
-      }),
-    )
+  const removeSerieLocal = useCallback(() => {
+    removeSerie(excercise, selectedSerie)
     setIsModalVisible(false)
-  }, [date, excercise, selectedSerie])
+  }, [excercise, selectedSerie])
 
   const saveSerie = useMemo(() => {
     return (
       <Button
         mode="text"
-        onPress={selectedSerie !== null ? editSerie : addSerieLocal}
+        onPress={selectedSerie !== null ? editSerieLocal : addSerieLocal}
         fullWidth={false}
       >
         {t(`shared.save`)}
       </Button>
     )
-  }, [addSerie, selectedSerie, editSerie, addSerieLocal])
+  }, [addSerie, selectedSerie, editSerieLocal, addSerieLocal])
 
   const openEditSerieModal = useCallback(
     (serieWeight, serieReps, serieIndex) => {
@@ -196,7 +189,7 @@ const WorkoutExcercise = ({
                   }`}
                 />
                 {selectedSerie !== null && (
-                  <Appbar.Action icon="delete" onPress={removeSerie} />
+                  <Appbar.Action icon="delete" onPress={removeSerieLocal} />
                 )}
               </Appbar.Header>
               <View style={styles.modalContent}>

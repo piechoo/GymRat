@@ -8,6 +8,7 @@ import {
 } from '@/Containers'
 import { View } from 'react-native'
 import { ProfileContainer } from '../Containers/ProfileContainer'
+import StartWorkoutContainer from '../Containers/StartWorkoutContainer'
 
 const Tab = createBottomTabNavigator()
 
@@ -40,7 +41,7 @@ const MainNavigator = ({ navigation }) => {
         /> */}
         <Tab.Screen
           name="Feed"
-          component={WorkoutContainer}
+          component={StartWorkoutContainer}
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',
@@ -48,7 +49,7 @@ const MainNavigator = ({ navigation }) => {
         />
         <Tab.Screen
           name="Agenda"
-          component={AgendaContainer}
+          component={StartWorkoutContainer}
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',
