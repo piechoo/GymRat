@@ -64,6 +64,8 @@ import firestore from '@react-native-firebase/firestore'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import { useTranslation } from 'react-i18next'
 import Button from '../Components/Button'
+import FeedContainer from './FeedContainer'
+import { useFocusEffect } from '@react-navigation/native'
 
 export const ProfileContainer = ({ navigation, route }) => {
   const { user, logout } = useContext(AuthContext)
@@ -73,73 +75,84 @@ export const ProfileContainer = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true)
   const [deleted, setDeleted] = useState(false)
   const [userData, setUserData] = useState(null)
+  const [userWorkoutCount, setUserWorkoutCount] = useState(null)
 
-  const fetchPosts = async () => {
-    try {
-      const list = []
+  console.log(route.params)
 
-      await firestore()
-        .collection('posts')
-        .where('userId', '==', route.params ? route.params.userId : user.uid)
-        .orderBy('postTime', 'desc')
-        .get()
-        .then(querySnapshot => {
-          // console.log('Total Posts: ', querySnapshot.size);
-
-          querySnapshot.forEach(doc => {
-            const { userId, post, postImg, postTime, likes, comments } =
-              doc.data()
-            list.push({
-              id: doc.id,
-              userId,
-              userName: 'Test Name',
-              userImg:
-                'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg',
-              postTime: postTime,
-              post,
-              postImg,
-              liked: false,
-              likes,
-              comments,
-            })
-          })
-        })
-
-      setPosts(list)
-
-      if (loading) {
-        setLoading(false)
-      }
-
-      console.log('Posts: ', posts)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  const getUser = async () => {
-    await firestore()
+  const getUser = () => {
+    return firestore()
       .collection('users')
-      .doc(route.params ? route.params.userId : user.uid)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          console.log('User Data', documentSnapshot.data())
+      .doc(route.params?.userId ? route.params.userId : user.uid)
+      .onSnapshot(documentSnapshot => {
+        if (documentSnapshot?.exists) {
           setUserData(documentSnapshot.data())
         }
       })
   }
+  const getWorkoutCount = () => {
+    return firestore()
+      .collection('workouts')
+      .where(
+        'userId',
+        '==',
+        route.params?.userId ? route.params.userId : user.uid,
+      )
+      .count()
+      .get()
+      .then(documentSnapshot => {
+        const userWrks = documentSnapshot.data().count
+        setUserWorkoutCount(userWrks)
+      })
+  }
 
-  useEffect(() => {
-    getUser()
-    fetchPosts()
-    navigation.addListener('focus', () => setLoading(!loading))
-  }, [navigation, loading])
+  useFocusEffect(
+    React.useCallback(() => {
+      const subscriber = getUser()
+      getWorkoutCount()
 
-  const handleDelete = () => {}
+      return () => {
+        subscriber()
+        // workoutCount()
+        navigation.setParams({ userId: null })
+        setUserData({})
+      }
+    }, [route.params?.userId, user.uid]),
+  )
+
+  const handleFollow = async () => {
+    if (route.params?.userId) {
+      if (!user?.followed?.includes?.(route.params?.userId)) {
+        firestore()
+          .collection('users')
+          .doc(route.params.userId)
+          .update({
+            followedBy: firestore.FieldValue.arrayUnion(user.uid),
+          })
+        firestore()
+          .collection('users')
+          .doc(user.uid)
+          .update({
+            followed: firestore.FieldValue.arrayUnion(route.params.userId),
+          })
+      } else {
+        firestore()
+          .collection('users')
+          .doc(route.params.userId)
+          .update({
+            followedBy: firestore.FieldValue.arrayRemove(user.uid),
+          })
+        firestore()
+          .collection('users')
+          .doc(user.uid)
+          .update({
+            followed: firestore.FieldValue.arrayRemove(route.params.userId),
+          })
+      }
+    }
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{
@@ -150,15 +163,16 @@ export const ProfileContainer = ({ navigation, route }) => {
       >
         <Image
           style={styles.userImg}
-          source={{
-            uri: userData
-              ? userData.userImg ||
-                'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg'
-              : 'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg',
-          }}
+          source={
+            userData?.userImg
+              ? {
+                  uri: userData.userImg,
+                }
+              : require('../Assets/Images/avatar.png')
+          }
         />
         <Text style={styles.userName}>
-          {userData ? userData.fname || 'Test' : 'Test'}{' '}
+          {userData ? userData.fname || 'New' : 'New'}{' '}
           {userData ? userData.lname || 'User' : 'User'}
         </Text>
         {/* <Text>{route.params ? route.params.userId : user.uid}</Text> */}
@@ -166,23 +180,19 @@ export const ProfileContainer = ({ navigation, route }) => {
           {userData ? userData.about || 'No details added.' : ''}
         </Text>
         <View style={styles.userBtnWrapper}>
-          {route.params ? (
+          {route.params?.userId && route.params?.userId !== user.uid ? (
             <>
               <Button
                 mode="outlined"
                 width={'40%'}
                 fullWidth={false}
-                onPress={() => {}}
+                onPress={handleFollow}
               >
-                {t(`Message`)}
-              </Button>
-              <Button
-                mode="outlined"
-                width={'40%'}
-                fullWidth={false}
-                onPress={() => {}}
-              >
-                {t(`Follow`)}
+                {t(
+                  !user?.followed?.includes?.(route.params.userId)
+                    ? `Follow`
+                    : 'Unfollow',
+                )}
               </Button>
             </>
           ) : (
@@ -211,15 +221,19 @@ export const ProfileContainer = ({ navigation, route }) => {
 
         <View style={styles.userInfoWrapper}>
           <View style={styles.userInfoItem}>
-            <Text style={styles.userInfoTitle}>{posts.length}</Text>
+            <Text style={styles.userInfoTitle}>{userWorkoutCount ?? 0}</Text>
             <Text style={styles.userInfoSubTitle}>Workouts</Text>
           </View>
           <View style={styles.userInfoItem}>
-            <Text style={styles.userInfoTitle}>10,000</Text>
+            <Text style={styles.userInfoTitle}>
+              {userData?.followedBy?.length ?? 0}
+            </Text>
             <Text style={styles.userInfoSubTitle}>Followers</Text>
           </View>
           <View style={styles.userInfoItem}>
-            <Text style={styles.userInfoTitle}>100</Text>
+            <Text style={styles.userInfoTitle}>
+              {userData?.followed?.length ?? 0}
+            </Text>
             <Text style={styles.userInfoSubTitle}>Following</Text>
           </View>
         </View>
@@ -227,6 +241,10 @@ export const ProfileContainer = ({ navigation, route }) => {
         {/* {posts.map(item => (
           <PostCard key={item.id} item={item} onDelete={handleDelete} />
         ))} */}
+        <FeedContainer
+          navigation={navigation}
+          userId={route.params?.userId ? route.params.userId : user.uid}
+        />
       </ScrollView>
     </SafeAreaView>
   )
@@ -235,7 +253,7 @@ export const ProfileContainer = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     padding: 20,
   },
   userImg: {

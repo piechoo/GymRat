@@ -20,6 +20,7 @@ import firestore from '@react-native-firebase/firestore'
 
 import WorkoutExcercise from '../Components/WorkoutExcercise'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
+import { getTotalLoad, getWorkoutTags } from '../Store/Excercises/consts'
 
 const styles = StyleSheet.create({
   addButton: { paddingHorizontal: 10, paddingVertical: 5 },
@@ -42,8 +43,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
 
   const fetchWorkoutToCopy = async () => {
     try {
-      const list = []
-
       await firestore()
         .collection('workouts')
         .where('userId', '==', user?.uid)
@@ -69,6 +68,8 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     // const imageUrl = await uploadImage()
     // console.log('Image Url: ', imageUrl)
     // console.log('Post: ', post)
+    const tags = getWorkoutTags(excercises)
+    const load = getTotalLoad(excercises)
 
     firestore()
       .collection('workouts')
@@ -78,6 +79,8 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         excercises: excercises,
         // postImg: imageUrl,
         postTime: firestore.Timestamp.fromDate(new Date()),
+        tags: tags,
+        load: load,
         likes: null,
         comments: null,
       })
@@ -254,6 +257,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           isVisible={isModalVisible}
           setVisible={setIsModalVisible}
           // buttons={addExcercisesButton}
+          closeLabel="Close"
           shouldStretch
         >
           <ExcercisesList

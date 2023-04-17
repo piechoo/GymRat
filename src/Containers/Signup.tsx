@@ -90,7 +90,7 @@ export default SignupScreen
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f9fafd',
+    // backgroundColor: '#f9fafd',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Kufam-SemiBoldItalic',
     fontSize: 28,
     marginBottom: 10,
-    color: '#051d5f',
+    // color: '#051d5f',
   },
   navButton: {
     marginTop: 15,

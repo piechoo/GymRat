@@ -7,14 +7,87 @@ export const defaultExcerciseValues = {
   sets: [],
 }
 export enum bodyParts {
-  chest= 'chest',
-  back= 'back',
-  legs= 'legs',
-  shoulders='shoulders',
-  biceps= 'biceps',
-  triceps= 'triceps',
-  abs= 'abs',
-  cardio= 'cardio',
+  chest = 'chest',
+  back = 'back',
+  legs = 'legs',
+  shoulders = 'shoulders',
+  biceps = 'biceps',
+  triceps = 'triceps',
+  abs = 'abs',
+  cardio = 'cardio',
+}
+
+export const getBodypartColor = bodypart => {
+  const colors = [
+    '#e44e43',
+    '#c94e62',
+    '#ab5179',
+    '#894b72',
+    '#51344e',
+    '#9d8bf4',
+    '#edb890',
+  ]
+  if (bodypart === bodyParts.chest) return colors[1]
+  if (bodypart === bodyParts.back) return colors[3]
+  if (bodypart === bodyParts.legs) return colors[0]
+  if (bodypart === bodyParts.shoulders) return colors[4]
+  if (bodypart === bodyParts.biceps) return colors[2]
+  if (bodypart === bodyParts.triceps) return colors[6]
+  if (bodypart === bodyParts.abs) return colors[5]
+}
+
+export const getExcerciseBodypart = ex => {
+  if (ex.id < 10) return bodyParts.chest
+  if (ex.id < 21) return bodyParts.back
+  if (ex.id < 40) return bodyParts.legs
+  if (ex.id < 48) return bodyParts.shoulders
+  if (ex.id < 55) return bodyParts.biceps
+  if (ex.id < 62) return bodyParts.triceps
+  if (ex.id < 69) return bodyParts.abs
+}
+export const getWorkoutTags = excercises => {
+  const defaultTags = [
+    { name: bodyParts.chest, value: 0 },
+    { name: bodyParts.back, value: 0 },
+    { name: bodyParts.legs, value: 0 },
+    { name: bodyParts.shoulders, value: 0 },
+    { name: bodyParts.shoulders, value: 0 },
+    { name: bodyParts.biceps, value: 0 },
+    { name: bodyParts.triceps, value: 0 },
+    { name: bodyParts.abs, value: 0 },
+  ]
+  console.log(excercises)
+  excercises.forEach(ex => {
+    const index = defaultTags.findIndex(
+      el => el.name === getExcerciseBodypart(ex),
+    )
+
+    defaultTags[index].value++
+  })
+
+  return defaultTags
+    .filter(el => el.value !== 0)
+    .sort((a, b) => {
+      if (a.value < b.value) {
+        return -1
+      }
+      if (a.value > b.value) {
+        return 1
+      }
+      // a must be equal to b
+      return 0
+    })
+}
+
+export const getTotalLoad = excercises => {
+  let load = 0
+
+  excercises.forEach(ex => {
+    ex.sets.forEach(element => {
+      load += element.reps * element.weight
+    })
+  })
+  return load
 }
 export const excercises = {
   [bodyParts.chest]: [

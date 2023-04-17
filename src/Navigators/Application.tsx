@@ -12,6 +12,7 @@ import { AuthContext } from '../Components/Authentication/AuthProvider'
 import AuthStack from './AuthStack'
 import EditProfileScreen from '../Containers/EditProfileContainer'
 import { WorkoutContainer } from '../Containers'
+import firestore from '@react-native-firebase/firestore'
 
 const Stack = createStackNavigator()
 
@@ -23,8 +24,27 @@ const ApplicationNavigator = () => {
   const { user, setUser } = useContext(AuthContext)
   const [initializing, setInitializing] = useState(true)
 
-  const onAuthStateChanged = (user: any) => {
-    setUser?.(user)
+  const onAuthStateChanged = async (user: any) => {
+    console.log(user)
+    const userData = user
+    if (user) {
+      await firestore()
+        .collection('users')
+        .doc(user.uid)
+        .get()
+        .then(documentSnapshot => {
+          if (documentSnapshot.exists) {
+            // setUserData(documentSnapshot.data())
+            const { followed, followedBy } = documentSnapshot.data()
+
+            console.log({ ...user._user, followed, followedBy })
+            setUser?.({ ...user._user, followed, followedBy })
+          }
+
+          // setUser?.(userData)
+        })
+    }
+
     if (initializing) setInitializing(false)
   }
 

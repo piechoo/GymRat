@@ -56,13 +56,13 @@ const EditProfileScreen = () => {
       .collection('users')
       .doc(user.uid)
       .update({
-        fname: userData.fname,
-        lname: userData.lname,
-        about: userData.about,
-        phone: userData.phone,
-        country: userData.country,
-        city: userData.city,
-        userImg: imgUrl,
+        fname: userData.fname ?? '',
+        lname: userData.lname ?? '',
+        about: userData.about ?? '',
+        phone: userData.phone ?? '',
+        country: userData.country ?? '',
+        city: userData.city ?? '',
+        userImg: imgUrl ?? '',
       })
       .then(() => {
         console.log('User Updated!')
@@ -266,10 +266,9 @@ const EditProfileScreen = () => {
         </View>
 
         <View style={styles.action}>
-          <FontAwesome name="user-o" color="#333333" size={20} />
+          <FontAwesome name="user-o" size={20} />
           <TextInput
             placeholder="First Name"
-            placeholderTextColor="#666666"
             autoCorrect={false}
             value={userData ? userData.fname : ''}
             onChangeText={txt => setUserData({ ...userData, fname: txt })}
@@ -277,10 +276,9 @@ const EditProfileScreen = () => {
           />
         </View>
         <View style={styles.action}>
-          <FontAwesome name="user-o" color="#333333" size={20} />
+          <FontAwesome name="user-o" size={20} />
           <TextInput
             placeholder="Last Name"
-            placeholderTextColor="#666666"
             value={userData ? userData.lname : ''}
             onChangeText={txt => setUserData({ ...userData, lname: txt })}
             autoCorrect={false}
@@ -288,12 +286,11 @@ const EditProfileScreen = () => {
           />
         </View>
         <View style={styles.action}>
-          <Ionicons name="ios-clipboard-outline" color="#333333" size={20} />
+          <Ionicons name="ios-clipboard-outline" size={20} />
           <TextInput
             multiline
             numberOfLines={3}
             placeholder="About Me"
-            placeholderTextColor="#666666"
             value={userData ? userData.about : ''}
             onChangeText={txt => setUserData({ ...userData, about: txt })}
             autoCorrect={true}
@@ -301,10 +298,9 @@ const EditProfileScreen = () => {
           />
         </View>
         <View style={styles.action}>
-          <Feather name="phone" color="#333333" size={20} />
+          <Feather name="phone" size={20} />
           <TextInput
             placeholder="Phone"
-            placeholderTextColor="#666666"
             keyboardType="number-pad"
             autoCorrect={false}
             value={userData ? userData.phone : ''}
@@ -314,10 +310,9 @@ const EditProfileScreen = () => {
         </View>
 
         <View style={styles.action}>
-          <FontAwesome name="globe" color="#333333" size={20} />
+          <FontAwesome name="globe" size={20} />
           <TextInput
             placeholder="Country"
-            placeholderTextColor="#666666"
             autoCorrect={false}
             value={userData ? userData.country : ''}
             onChangeText={txt => setUserData({ ...userData, country: txt })}
@@ -325,14 +320,9 @@ const EditProfileScreen = () => {
           />
         </View>
         <View style={styles.action}>
-          <MaterialCommunityIcons
-            name="map-marker-outline"
-            color="#333333"
-            size={20}
-          />
+          <MaterialCommunityIcons name="map-marker-outline" size={20} />
           <TextInput
             placeholder="City"
-            placeholderTextColor="#666666"
             autoCorrect={false}
             value={userData ? userData.city : ''}
             onChangeText={txt => setUserData({ ...userData, city: txt })}
@@ -352,24 +342,24 @@ export default EditProfileScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   commandButton: {
     padding: 15,
     borderRadius: 10,
-    backgroundColor: '#FF6347',
+    // backgroundColor: '#FF6347',
     alignItems: 'center',
     marginTop: 10,
   },
   panel: {
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    // backgroundColor: '#FFFFFF',
     paddingTop: 20,
     width: '100%',
   },
   header: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#333333',
+    // backgroundColor: '#FFFFFF',
+    // shadowColor: '#333333',
     shadowOffset: { width: -1, height: -3 },
     shadowRadius: 2,
     shadowOpacity: 0.4,
@@ -384,7 +374,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#00000040',
+    // backgroundColor: '#00000040',
     marginBottom: 10,
   },
   panelTitle: {
@@ -393,14 +383,14 @@ const styles = StyleSheet.create({
   },
   panelSubtitle: {
     fontSize: 14,
-    color: 'gray',
+    // color: 'gray',
     height: 30,
     marginBottom: 10,
   },
   panelButton: {
     padding: 13,
     borderRadius: 10,
-    backgroundColor: '#2e64e5',
+    // backgroundColor: '#2e64e5',
     alignItems: 'center',
     marginVertical: 7,
   },
@@ -414,21 +404,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#f2f2f2',
+    // borderBottomColor: '#f2f2f2',
     paddingBottom: 5,
   },
   actionError: {
     flexDirection: 'row',
     marginTop: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#FF0000',
+    // borderBottomColor: '#FF0000',
     paddingBottom: 5,
   },
   textInput: {
     flex: 1,
     marginTop: Platform.OS === 'ios' ? 0 : -12,
     paddingLeft: 10,
-    color: '#333333',
+    // color: '#fff',
   },
   button: {
     marginTop: 15,

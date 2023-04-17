@@ -49,6 +49,7 @@ const WorkoutExcercise = ({
   editSerie,
   removeSerie,
   addSerie,
+  readOnly,
 }: Props) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [isInfoVisible, setIsInfoVisible] = useState(false)
@@ -84,7 +85,7 @@ const WorkoutExcercise = ({
   }, [excercise, selectedSerie])
 
   const saveSerie = useMemo(() => {
-    return (
+    return readOnly ? null : (
       <Button
         mode="text"
         onPress={selectedSerie !== null ? editSerieLocal : addSerieLocal}
@@ -93,7 +94,7 @@ const WorkoutExcercise = ({
         {t(`shared.save`)}
       </Button>
     )
-  }, [addSerie, selectedSerie, editSerieLocal, addSerieLocal])
+  }, [addSerie, selectedSerie, editSerieLocal, addSerieLocal, readOnly])
 
   const openEditSerieModal = useCallback(
     (serieWeight, serieReps, serieIndex) => {
@@ -127,11 +128,13 @@ const WorkoutExcercise = ({
           {excercise.name}
         </Text>
         <Text variant="bodyMedium">{excercise.type}</Text>
-        <IconButton
-          style={styles.delete}
-          icon="delete"
-          onPress={() => removeExercise(excercise)}
-        />
+        {!readOnly && (
+          <IconButton
+            style={styles.delete}
+            icon="delete"
+            onPress={() => removeExercise(excercise)}
+          />
+        )}
         <View style={styles.content}>
           {excercise?.sets?.map((serie, i) => {
             return (
@@ -141,9 +144,10 @@ const WorkoutExcercise = ({
                 key={excercise.name + i}
               >
                 <TouchableRipple
-                  onPress={() =>
-                    openEditSerieModal(serie.weight, serie.reps, i)
-                  }
+                  onPress={() => {
+                    if (!readOnly)
+                      openEditSerieModal(serie.weight, serie.reps, i)
+                  }}
                   style={{ padding: 20, borderRadius: 10 }}
                   rippleColor="#474747"
                   borderless
@@ -157,83 +161,87 @@ const WorkoutExcercise = ({
             )
           })}
         </View>
-        <Button
-          icon="plus"
-          mode="elevated"
-          onPress={() => {
-            setSelectedSerie(null)
-            setIsModalErrorVisible(false)
-            setIsModalVisible(true)
-          }}
-        >
-          {t(`workoutExcercise.addSerie`)}
-        </Button>
-        <Portal>
-          <Modal
-            isVisible={isModalVisible}
-            setVisible={setIsModalVisible}
-            buttons={saveSerie}
+        {!readOnly && (
+          <Button
+            icon="plus"
+            mode="elevated"
+            onPress={() => {
+              setSelectedSerie(null)
+              setIsModalErrorVisible(false)
+              setIsModalVisible(true)
+            }}
           >
-            <>
-              <Appbar.Header>
-                <Appbar.BackAction
-                  onPress={() => {
-                    setIsModalVisible(false)
-                  }}
-                />
-                <Appbar.Content
-                  title={`${t(`workoutExcercise.setEmpty`)} ${
-                    selectedSerie !== null
-                      ? selectedSerie + 1
-                      : excercise?.sets?.length + 1
-                  }`}
-                />
-                {selectedSerie !== null && (
-                  <Appbar.Action icon="delete" onPress={removeSerieLocal} />
-                )}
-              </Appbar.Header>
-              <View style={styles.modalContent}>
-                <TextInput
-                  label={t(`workoutExcercise.weight`)}
-                  value={`${weight}`}
-                  onChangeText={changeWeight}
-                  right={<TextInput.Affix text="KG" />}
-                  inputMode={'decimal'}
-                  keyboardType={'decimal-pad'}
-                />
-                <View style={styles.divider} />
-                <TextInput
-                  label={t(`workoutExcercise.reps`)}
-                  value={`${reps}`}
-                  onChangeText={changeReps}
-                  inputMode={'decimal'}
-                  keyboardType={'decimal-pad'}
-                />
-              </View>
-              <HelperText type="error" visible={isModalErrorVisible}>
-                {t(`workoutExcercise.cantBeEmpty`)}
-              </HelperText>
-            </>
-          </Modal>
+            {t(`workoutExcercise.addSerie`)}
+          </Button>
+        )}
+        {readOnly ? null : (
+          <Portal>
+            <Modal
+              isVisible={isModalVisible}
+              setVisible={setIsModalVisible}
+              buttons={saveSerie}
+            >
+              <>
+                <Appbar.Header>
+                  <Appbar.BackAction
+                    onPress={() => {
+                      setIsModalVisible(false)
+                    }}
+                  />
+                  <Appbar.Content
+                    title={`${t(`workoutExcercise.setEmpty`)} ${
+                      selectedSerie !== null
+                        ? selectedSerie + 1
+                        : excercise?.sets?.length + 1
+                    }`}
+                  />
+                  {selectedSerie !== null && !readOnly && (
+                    <Appbar.Action icon="delete" onPress={removeSerieLocal} />
+                  )}
+                </Appbar.Header>
+                <View style={styles.modalContent}>
+                  <TextInput
+                    label={t(`workoutExcercise.weight`)}
+                    value={`${weight}`}
+                    onChangeText={changeWeight}
+                    right={<TextInput.Affix text="KG" />}
+                    inputMode={'decimal'}
+                    keyboardType={'decimal-pad'}
+                  />
+                  <View style={styles.divider} />
+                  <TextInput
+                    label={t(`workoutExcercise.reps`)}
+                    value={`${reps}`}
+                    onChangeText={changeReps}
+                    inputMode={'decimal'}
+                    keyboardType={'decimal-pad'}
+                  />
+                </View>
+                <HelperText type="error" visible={isModalErrorVisible}>
+                  {t(`workoutExcercise.cantBeEmpty`)}
+                </HelperText>
+              </>
+            </Modal>
 
-          <Modal
-            isVisible={isInfoVisible}
-            setVisible={setIsInfoVisible}
-            buttons={saveSerie}
-          >
-            <>
-              <Appbar.Header>
-                <Appbar.BackAction
-                  onPress={() => {
-                    setIsInfoVisible(false)
-                  }}
-                />
-                <Appbar.Content title={excercise.name} />
-              </Appbar.Header>
-              <ExcerciseDetails excerciseId={excercise.id} />
-            </>
-          </Modal>
-        </Portal>
+            <Modal
+              isVisible={isInfoVisible}
+              setVisible={setIsInfoVisible}
+              buttons={saveSerie}
+            >
+              <>
+                <Appbar.Header>
+                  <Appbar.BackAction
+                    onPress={() => {
+                      setIsInfoVisible(false)
+                    }}
+                  />
+                  <Appbar.Content title={excercise.name} />
+                </Appbar.Header>
+                <ExcerciseDetails excerciseId={excercise.id} />
+              </>
+            </Modal>
+          </Portal>
+        )}
       </Card.Content>
     </Card>
   )

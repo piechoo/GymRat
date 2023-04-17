@@ -54,27 +54,21 @@ const OnboardingScreen = ({ navigation }) => {
       pages={[
         {
           backgroundColor: '#a6e4d0',
-          image: (
-            <Image source={require('../Assets/Images/onboarding-img1.png')} />
-          ),
-          title: 'Connect to the World',
-          subtitle: 'A New Way To Connect With The World',
+          image: <Image source={require('../Assets/Images/onboard1.png')} />,
+          title: 'Workout Smart',
+          subtitle: 'Keep track of your training sessions',
         },
         {
           backgroundColor: '#fdeb93',
-          image: (
-            <Image source={require('../Assets/Images/onboarding-img2.png')} />
-          ),
-          title: 'Share Your Favorites',
-          subtitle: 'Share Your Thoughts With Similar Kind of People',
+          image: <Image source={require('../Assets/Images/onboard2.png')} />,
+          title: 'Be Motivated',
+          subtitle: 'See your progress in chosen excercises',
         },
         {
           backgroundColor: '#e9bcbe',
-          image: (
-            <Image source={require('../Assets/Images/onboarding-img3.png')} />
-          ),
+          image: <Image source={require('../Assets/Images/onboard3.png')} />,
           title: 'Become The Star',
-          subtitle: 'Let The Spot Light Capture You',
+          subtitle: 'Share Your training with friends and other users',
         },
       ]}
     />

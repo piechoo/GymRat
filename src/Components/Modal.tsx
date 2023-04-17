@@ -10,11 +10,19 @@ interface ModalProps {
   setVisible: (arg: boolean) => any
   buttons?: React.ReactElement
   shouldStretch?: boolean
+  closeLabel?: string
   children: React.ReactElement
 }
 
 const Modal = memo(
-  ({ isVisible, setVisible, buttons, shouldStretch, children }: ModalProps) => {
+  ({
+    isVisible,
+    setVisible,
+    buttons,
+    shouldStretch,
+    children,
+    closeLabel = 'Cancel',
+  }: ModalProps) => {
     const hideModal = () => setVisible(false)
     const { Layout } = useTheme()
 
@@ -42,7 +50,7 @@ const Modal = memo(
               fullWidth={false}
               onPress={() => setVisible(false)}
             >
-              Cancel
+              {closeLabel}
             </Button>
           </View>
         </PaperModal>

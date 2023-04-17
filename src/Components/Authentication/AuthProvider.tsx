@@ -51,22 +51,29 @@ export const AuthProvider = ({ children }: Props) => {
                 //Once the user creation has happened successfully, we can add the currentUser into firestore
                 //with the appropriate details.
                 // console.log('current User', auth().currentUser);
+                const currentGoogleUser = auth().currentUser
+                const firstName = currentGoogleUser?.displayName?.includes(' ')
+                  ? currentGoogleUser?.displayName.split(' ')[0]
+                  : currentGoogleUser?.displayName
+                const lastName = currentGoogleUser?.displayName?.includes(' ')
+                  ? currentGoogleUser?.displayName.split(' ')[1]
+                  : 'Last Name'
 
                 firestore()
                   .collection('users')
-                  .doc(auth().currentUser.uid)
+                  .doc(currentGoogleUser?.uid)
                   .get()
                   .then(documentSnapshot => {
                     if (!documentSnapshot.exists) {
                       firestore()
                         .collection('users')
-                        .doc(auth().currentUser.uid)
+                        .doc(currentGoogleUser?.uid)
                         .set({
-                          fname: '',
-                          lname: '',
-                          email: auth().currentUser.email,
+                          fname: firstName,
+                          lname: lastName,
+                          email: currentGoogleUser?.email,
                           createdAt: firestore.Timestamp.fromDate(new Date()),
-                          userImg: null,
+                          userImg: currentGoogleUser?.photoURL,
                         })
                         //ensure we catch any errors at this stage to advise us if something does go wrong
                         .catch(error => {

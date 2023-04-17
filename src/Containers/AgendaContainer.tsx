@@ -39,7 +39,6 @@ const AgendaContainer = React.memo(({ navigation }) => {
       setDisplayFab(true)
 
       return () => {
-        console.log('FOCUSOUT')
         setDisplayFab(false)
       }
     }, []),

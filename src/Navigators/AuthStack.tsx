@@ -58,8 +58,8 @@ const AuthStack = () => {
         options={({ navigation }) => ({
           title: '',
           headerStyle: {
-            backgroundColor: '#f9fafd',
-            shadowColor: '#f9fafd',
+            // backgroundColor: '#f9fafd',
+            // shadowColor: '#f9fafd',
             elevation: 0,
           },
           headerLeft: () => (
@@ -67,7 +67,7 @@ const AuthStack = () => {
               <IconButton
                 icon="arrow-left"
                 size={25}
-                style={{ backgroundColor: '#f9fafd', color: '#333' }}
+                // style={{ backgroundColor: '#f9fafd', color: '#333' }}
                 onPress={() => navigation.navigate('Login')}
               />
             </View>

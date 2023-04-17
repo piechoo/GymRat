@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Kufam-SemiBoldItalic',
     fontSize: 28,
     marginBottom: 10,
-    color: '#051d5f',
+    // color: '#051d5f',
   },
   navButton: {
     marginTop: 15,
