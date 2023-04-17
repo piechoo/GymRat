@@ -56,7 +56,6 @@ export const getWorkoutTags = excercises => {
     { name: bodyParts.triceps, value: 0 },
     { name: bodyParts.abs, value: 0 },
   ]
-  console.log(excercises)
   excercises.forEach(ex => {
     const index = defaultTags.findIndex(
       el => el.name === getExcerciseBodypart(ex),

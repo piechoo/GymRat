@@ -32,9 +32,7 @@ const ExampleContainer = () => {
     dispatch(changeTheme({ theme, darkMode }))
   }
 
-  const userName = useSelector(getUserName)
   const { user, logout } = useContext(AuthContext)
-  console.log(user)
 
   return (
     <ScrollView

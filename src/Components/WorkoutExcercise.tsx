@@ -137,7 +137,20 @@ const WorkoutExcercise = ({
         )}
         <View style={styles.content}>
           {excercise?.sets?.map((serie, i) => {
-            return (
+            return readOnly ? (
+              <Surface
+                style={styles.surface}
+                elevation={1}
+                key={excercise.name + i}
+              >
+                <View style={{ padding: 20, borderRadius: 10 }}>
+                  <View style={styles.setButton}>
+                    <NumberValue value={serie.weight} desc="KG" />
+                    <NumberValue value={serie.reps} desc="Reps" />
+                  </View>
+                </View>
+              </Surface>
+            ) : (
               <Surface
                 style={styles.surface}
                 elevation={1}

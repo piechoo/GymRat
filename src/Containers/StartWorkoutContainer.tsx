@@ -35,12 +35,6 @@ const StartWorkoutContainer = React.memo(({ navigation }) => {
   const onSelectDate = useCallback(day => {
     setSelectedDate(day?.dateString)
   }, [])
-  // useEffect(() => {
-  //   navigation.addListener('focus', () => {
-  //     setDisplayFab(true)
-  //     console.log('sraka')
-  //   })
-  // }, [navigation])
 
   const fetchWorkoutToCopy = async () => {
     try {

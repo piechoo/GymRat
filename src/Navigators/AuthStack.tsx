@@ -29,7 +29,6 @@ const AuthStack = () => {
       webClientId:
         '999882760125-j3rhgi2jsbvefp4dbni2buii9pngvqd7.apps.googleusercontent.com',
     })
-    console.log('configur')
   }, [])
 
   if (isFirstLaunch === null) {

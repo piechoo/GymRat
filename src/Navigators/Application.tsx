@@ -25,7 +25,6 @@ const ApplicationNavigator = () => {
   const [initializing, setInitializing] = useState(true)
 
   const onAuthStateChanged = async (user: any) => {
-    console.log(user)
     const userData = user
     if (user) {
       await firestore()
@@ -34,7 +33,6 @@ const ApplicationNavigator = () => {
         .get()
         .then(documentSnapshot => {
           if (documentSnapshot.exists) {
-            // setUserData(documentSnapshot.data())
             const { followed, followedBy } = documentSnapshot.data()
 
             console.log({ ...user._user, followed, followedBy })

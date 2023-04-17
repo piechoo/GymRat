@@ -63,22 +63,8 @@ const SimpleWorkoutPreview = ({ workout }) => {
 
   return (
     <Card style={styles.card} mode={'contained'}>
-      {/* <Text variant="titleLarge">Workout {workout.day}</Text> */}
-
-      <View
-        style={{
-          marginLeft: 10,
-          marginTop: 10,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-        <TouchableOpacity
-          onPress={() =>
-            navigate('Profile', {
-              userId: workout.userId,
-            })
-          }
+      {workout.userId && (
+        <View
           style={{
             marginLeft: 10,
             marginTop: 10,
@@ -86,25 +72,39 @@ const SimpleWorkoutPreview = ({ workout }) => {
             alignItems: 'center',
           }}
         >
-          <Image
-            style={{
-              height: 50,
-              width: 50,
-              borderRadius: 50,
-            }}
-            source={
-              userData?.userImg
-                ? {
-                    uri: userData?.userImg,
-                  }
-                : require('../Assets/Images/avatar.png')
+          <TouchableOpacity
+            onPress={() =>
+              navigate('Profile', {
+                userId: workout.userId,
+              })
             }
-          />
-          <Text variant="titleLarge" style={{ paddingLeft: 10 }}>
-            {userData?.fname} {userData?.lname}
-          </Text>
-        </TouchableOpacity>
-      </View>
+            style={{
+              marginLeft: 10,
+              marginTop: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          >
+            <Image
+              style={{
+                height: 50,
+                width: 50,
+                borderRadius: 50,
+              }}
+              source={
+                userData?.userImg
+                  ? {
+                      uri: userData?.userImg,
+                    }
+                  : require('../Assets/Images/avatar.png')
+              }
+            />
+            <Text variant="titleLarge" style={{ paddingLeft: 10 }}>
+              {userData?.fname} {userData?.lname}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <Card.Content>
         <WorkoutExcercise
@@ -117,12 +117,7 @@ const SimpleWorkoutPreview = ({ workout }) => {
             workout.excercises.length - 1
           } more`}</Text>
         )}
-        <Chip
-          icon="information"
-          // mode="outlined"
-          elevated
-          onPress={() => console.log('Pressed')}
-        >
+        <Chip icon="information" elevated>
           Total volume: {workout.load} KG
         </Chip>
         <View style={{ flexDirection: 'row', paddingVertical: 10 }}>

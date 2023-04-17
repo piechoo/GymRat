@@ -34,7 +34,6 @@ export const AuthProvider = ({ children }: Props) => {
           }
         },
         googleLogin: async () => {
-          console.log('guguiel')
           try {
             // Get the users ID token
             const { idToken } = await GoogleSignin.signIn()
@@ -50,7 +49,6 @@ export const AuthProvider = ({ children }: Props) => {
               .then(() => {
                 //Once the user creation has happened successfully, we can add the currentUser into firestore
                 //with the appropriate details.
-                // console.log('current User', auth().currentUser);
                 const currentGoogleUser = auth().currentUser
                 const firstName = currentGoogleUser?.displayName?.includes(' ')
                   ? currentGoogleUser?.displayName.split(' ')[0]

@@ -27,12 +27,6 @@ const AgendaContainer = React.memo(({ navigation }) => {
   const onSelectDate = useCallback(day => {
     setSelectedDate(day?.dateString)
   }, [])
-  // useEffect(() => {
-  //   navigation.addListener('focus', () => {
-  //     setDisplayFab(true)
-  //     console.log('sraka')
-  //   })
-  // }, [navigation])
 
   useFocusEffect(
     React.useCallback(() => {
