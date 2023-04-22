@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
   },
   avatar: {
     marginLeft: 10,
+    backgroundColor: '#dbdbdb',
   },
 })
 
@@ -90,12 +91,14 @@ const UsersList = ({ selectedUsersIds, setIsModalVisible, title }) => {
           />
         )}
 
-        <Appbar.Action
-          icon="magnify"
-          onPress={() => {
-            getUser()
-          }}
-        />
+        {!title && (
+          <Appbar.Action
+            icon="magnify"
+            onPress={() => {
+              getUser()
+            }}
+          />
+        )}
       </Appbar.Header>
       {users.length > 0 && (
         <FlatList

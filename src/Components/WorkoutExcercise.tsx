@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
   setButton: { flexDirection: 'column', padding: 5, borderRadius: 10 },
   modalContent: { paddingHorizontal: 20 },
   divider: { padding: 5 },
+  serie: { padding: 16, borderRadius: 10 },
 })
 
 const WorkoutExcercise = ({
@@ -143,7 +144,7 @@ const WorkoutExcercise = ({
                 elevation={1}
                 key={excercise.name + i}
               >
-                <View style={{ padding: 20, borderRadius: 10 }}>
+                <View style={styles.serie}>
                   <View style={styles.setButton}>
                     <NumberValue value={serie.weight} desc="KG" />
                     <NumberValue value={serie.reps} desc="Reps" />
@@ -161,7 +162,7 @@ const WorkoutExcercise = ({
                     if (!readOnly)
                       openEditSerieModal(serie.weight, serie.reps, i)
                   }}
-                  style={{ padding: 20, borderRadius: 10 }}
+                  style={styles.serie}
                   rippleColor="#474747"
                   borderless
                 >
