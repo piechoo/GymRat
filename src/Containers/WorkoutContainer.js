@@ -65,9 +65,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   }
 
   const submitWorkout = async () => {
-    // const imageUrl = await uploadImage()
-    // console.log('Image Url: ', imageUrl)
-    // console.log('Post: ', post)
     const tags = getWorkoutTags(excercises)
     const load = getTotalLoad(excercises)
 

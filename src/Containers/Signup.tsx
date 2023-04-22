@@ -1,13 +1,16 @@
 import React, { useContext, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { TextInput } from 'react-native-paper'
+import { HelperText, TextInput } from 'react-native-paper'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import Button from '../Components/Button'
 
 const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [fname, setFname] = useState('')
+  const [lname, setLname] = useState('')
+  const [isErrorVisible, setIsErrorVisible] = useState(false)
   const [confirmPassword, setConfirmPassword] = useState('')
 
   const { register, googleLogin } = useContext(AuthContext)
@@ -19,14 +22,41 @@ const SignupScreen = ({ navigation }) => {
 
       <View style={styles.modalContent}>
         <TextInput
+          label="First Name"
+          placeholder="First Name"
+          value={fname}
+          onChangeText={userEmail => {
+            setFname(userEmail)
+            setIsErrorVisible(false)
+          }}
+          autoCapitalize="words"
+          autoCorrect={false}
+        />
+        <View style={styles.divider} />
+        <TextInput
+          label="Last Name"
+          placeholder="First Name"
+          value={lname}
+          onChangeText={userEmail => {
+            setLname(userEmail)
+            setIsErrorVisible(false)
+          }}
+          autoCapitalize="words"
+          autoCorrect={false}
+        />
+        <View style={styles.divider} />
+        <TextInput
           label="Email"
           placeholder="Email"
           value={email}
-          onChangeText={userEmail => setEmail(userEmail)}
+          onChangeText={userEmail => {
+            setEmail(userEmail)
+            setIsErrorVisible(false)
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
-          right={<TextInput.Icon icon="account" />}
+          // right={<TextInput.Icon icon="account" />}
         />
         <View style={styles.divider} />
 
@@ -34,7 +64,10 @@ const SignupScreen = ({ navigation }) => {
           label="Password"
           placeholder="Password"
           value={password}
-          onChangeText={userPassword => setPassword(userPassword)}
+          onChangeText={userPassword => {
+            setPassword(userPassword)
+            setIsErrorVisible(false)
+          }}
           autoCorrect={false}
           secureTextEntry={true}
         />
@@ -44,13 +77,36 @@ const SignupScreen = ({ navigation }) => {
           label="Confirm Password"
           placeholder="Confirm Password"
           value={confirmPassword}
-          onChangeText={userPassword => setConfirmPassword(userPassword)}
+          onChangeText={userPassword => {
+            setConfirmPassword(userPassword)
+            setIsErrorVisible(false)
+          }}
           autoCorrect={false}
           secureTextEntry={true}
         />
         <View style={styles.divider} />
       </View>
-      <Button mode="elevated" onPress={() => register?.(email, password)}>
+      <HelperText type="error" visible={isErrorVisible}>
+        {t(`Please fill required data`)}
+      </HelperText>
+      <Button
+        mode="elevated"
+        onPress={() => {
+          if (
+            !email ||
+            !password ||
+            password != confirmPassword ||
+            !lname ||
+            !fname
+          ) {
+            console.log(password)
+            console.log(confirmPassword)
+            console.log(password != confirmPassword)
+
+            setIsErrorVisible(true)
+          } else register?.(email, password, fname, lname)
+        }}
+      >
         {t(`Sign Up`)}
       </Button>
 
@@ -68,7 +124,7 @@ const SignupScreen = ({ navigation }) => {
         {'Have an account? Sign In'}
       </Button>
 
-      <View style={styles.textPrivate}>
+      {/* <View style={styles.textPrivate}>
         <Text style={styles.color_textPrivate}>
           By registering, you confirm that you accept our{' '}
         </Text>
@@ -81,7 +137,7 @@ const SignupScreen = ({ navigation }) => {
         <Text style={[styles.color_textPrivate, { color: '#de4d41' }]}>
           Privacy Policy
         </Text>
-      </View>
+      </View> */}
     </View>
   )
 }

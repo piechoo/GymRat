@@ -66,6 +66,8 @@ import { useTranslation } from 'react-i18next'
 import Button from '../Components/Button'
 import FeedContainer from './FeedContainer'
 import { useFocusEffect } from '@react-navigation/native'
+import Modal from '../Components/Modal'
+import UsersList from '../Components/UsersList'
 
 export const ProfileContainer = ({ navigation, route }) => {
   const { user, logout } = useContext(AuthContext)
@@ -74,10 +76,11 @@ export const ProfileContainer = ({ navigation, route }) => {
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [deleted, setDeleted] = useState(false)
+  const [modalTitle, setModalTitle] = useState('')
   const [userData, setUserData] = useState(null)
+  const [selectedUserIds, setSelectedUserIds] = useState(null)
+  const [isModalVisible, setIsModalVisible] = useState(false)
   const [userWorkoutCount, setUserWorkoutCount] = useState(null)
-
-  console.log(route.params)
 
   const getUser = () => {
     return firestore()
@@ -112,11 +115,17 @@ export const ProfileContainer = ({ navigation, route }) => {
 
       return () => {
         subscriber()
-        // workoutCount()
+      }
+    }, [route.params?.userId, user.uid]),
+  )
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
         navigation.setParams({ userId: null })
         setUserData({})
       }
-    }, [route.params?.userId, user.uid]),
+    }, []),
   )
 
   const handleFollow = async () => {
@@ -211,7 +220,10 @@ export const ProfileContainer = ({ navigation, route }) => {
                 width={'40%'}
                 mode="outlined"
                 fullWidth={false}
-                onPress={() => logout()}
+                onPress={() => {
+                  logout()
+                  // navigation.navigate('Login')
+                }}
               >
                 {t(`Logout`)}
               </Button>
@@ -224,28 +236,52 @@ export const ProfileContainer = ({ navigation, route }) => {
             <Text style={styles.userInfoTitle}>{userWorkoutCount ?? 0}</Text>
             <Text style={styles.userInfoSubTitle}>Workouts</Text>
           </View>
-          <View style={styles.userInfoItem}>
-            <Text style={styles.userInfoTitle}>
-              {userData?.followedBy?.length ?? 0}
-            </Text>
-            <Text style={styles.userInfoSubTitle}>Followers</Text>
-          </View>
-          <View style={styles.userInfoItem}>
-            <Text style={styles.userInfoTitle}>
-              {userData?.followed?.length ?? 0}
-            </Text>
-            <Text style={styles.userInfoSubTitle}>Following</Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedUserIds(userData?.followedBy)
+              setIsModalVisible(true)
+              setModalTitle('Followers')
+            }}
+          >
+            <View style={styles.userInfoItem}>
+              <Text style={styles.userInfoTitle}>
+                {userData?.followedBy?.length ?? 0}
+              </Text>
+              <Text style={styles.userInfoSubTitle}>Followers</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedUserIds(userData?.followed)
+              setIsModalVisible(true)
+              setModalTitle('Following')
+            }}
+          >
+            <View style={styles.userInfoItem}>
+              <Text style={styles.userInfoTitle}>
+                {userData?.followed?.length ?? 0}
+              </Text>
+              <Text style={styles.userInfoSubTitle}>Following</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-
-        {/* {posts.map(item => (
-          <PostCard key={item.id} item={item} onDelete={handleDelete} />
-        ))} */}
         <FeedContainer
           navigation={navigation}
           userId={route.params?.userId ? route.params.userId : user.uid}
         />
       </ScrollView>
+      <Modal
+        isVisible={isModalVisible}
+        setVisible={setIsModalVisible}
+        closeLabel="Close"
+        shouldStretch
+      >
+        <UsersList
+          setIsModalVisible={setIsModalVisible}
+          selectedUsersIds={selectedUserIds}
+          title={modalTitle}
+        />
+      </Modal>
     </SafeAreaView>
   )
 }

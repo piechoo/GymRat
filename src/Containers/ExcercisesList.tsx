@@ -71,7 +71,6 @@ const ExcercisesList = ({
               left={props => <List.Icon {...props} icon="weight-lifter" />}
               onPress={() => {
                 setSelectedExcercises(state => {
-                  console.log(item)
                   if (state.indexOf(item) === -1) return [...state, item]
                   return state.filter(n => n.id !== item.id)
                 })

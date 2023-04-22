@@ -25,7 +25,6 @@ const ApplicationNavigator = () => {
   const [initializing, setInitializing] = useState(true)
 
   const onAuthStateChanged = async (user: any) => {
-    const userData = user
     if (user) {
       await firestore()
         .collection('users')

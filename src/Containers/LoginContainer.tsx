@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native'
-import { TextInput } from 'react-native-paper'
+import { HelperText, TextInput } from 'react-native-paper'
 import { useTranslation } from 'react-i18next'
 import SocialButton from '../Components/SocialButton'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
@@ -17,6 +17,7 @@ import Button from '../Components/Button'
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isErrorVisible, setIsErrorVisible] = useState(false)
 
   const { login, googleLogin } = useContext(AuthContext)
   const { t } = useTranslation()
@@ -42,7 +43,10 @@ const LoginScreen = ({ navigation }) => {
         label="Email"
         placeholder="Email"
         value={email}
-        onChangeText={userEmail => setEmail(userEmail)}
+        onChangeText={userEmail => {
+          setEmail(userEmail)
+          setIsErrorVisible(false)
+        }}
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
@@ -55,12 +59,24 @@ const LoginScreen = ({ navigation }) => {
         label="Password"
         placeholder="Password"
         value={password}
-        onChangeText={userPassword => setPassword(userPassword)}
+        onChangeText={userPassword => {
+          setPassword(userPassword)
+          setIsErrorVisible(false)
+        }}
         autoCorrect={false}
         secureTextEntry={true}
       />
+      <HelperText type="error" visible={isErrorVisible}>
+        {t(`Please fill required data`)}
+      </HelperText>
 
-      <Button mode="elevated" onPress={() => login?.(email, password)}>
+      <Button
+        mode="elevated"
+        onPress={() => {
+          if (!email || !password) setIsErrorVisible(true)
+          else login?.(email, password)
+        }}
+      >
         {t(`Sign In`)}
       </Button>
 
@@ -74,7 +90,6 @@ const LoginScreen = ({ navigation }) => {
         {'Sign In with Google'}
       </Button>
 
-      <Button onPress={() => {}}>{'Forgot Password?'}</Button>
       <Button onPress={() => navigation.navigate('Signup')}>
         {"Don't have an acount? Create here"}
       </Button>

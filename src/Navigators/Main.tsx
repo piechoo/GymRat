@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
   AgendaContainer,
@@ -10,11 +10,16 @@ import { View } from 'react-native'
 import { ProfileContainer } from '../Containers/ProfileContainer'
 import StartWorkoutContainer from '../Containers/StartWorkoutContainer'
 import FeedContainer from '../Containers/FeedContainer'
+import { IconButton } from 'react-native-paper'
+import Modal from '../Components/Modal'
+import UsersList from '../Components/UsersList'
 
 const Tab = createBottomTabNavigator()
 
 // @refresh reset
 const MainNavigator = ({ navigation }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false)
+
   return (
     <View
       style={{
@@ -46,6 +51,13 @@ const MainNavigator = ({ navigation }) => {
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',
+            headerRight: () => (
+              <IconButton
+                icon="magnify"
+                size={30}
+                onPress={() => setIsModalVisible(true)}
+              />
+            ),
           }}
         />
         <Tab.Screen
@@ -65,6 +77,14 @@ const MainNavigator = ({ navigation }) => {
           }}
         />
       </Tab.Navigator>
+      <Modal
+        isVisible={isModalVisible}
+        setVisible={setIsModalVisible}
+        closeLabel="Close"
+        shouldStretch
+      >
+        <UsersList setIsModalVisible={setIsModalVisible} />
+      </Modal>
     </View>
   )
 }

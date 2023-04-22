@@ -145,7 +145,12 @@ export const AuthProvider = ({ children }: Props) => {
         //     console.log({ error })
         //   }
         // },
-        register: async (email: string, password: string) => {
+        register: async (
+          email: string,
+          password: string,
+          fname: string = '',
+          lname: string = '',
+        ) => {
           try {
             await auth()
               .createUserWithEmailAndPassword(email, password)
@@ -156,8 +161,8 @@ export const AuthProvider = ({ children }: Props) => {
                   .collection('users')
                   .doc(auth()?.currentUser?.uid)
                   .set({
-                    fname: '',
-                    lname: '',
+                    fname: fname,
+                    lname: lname,
                     email: email,
                     createdAt: firestore.Timestamp.fromDate(new Date()),
                     userImg: null,
@@ -181,6 +186,7 @@ export const AuthProvider = ({ children }: Props) => {
         logout: async () => {
           try {
             await auth().signOut()
+            setUser('')
           } catch (e) {
             console.log(e)
           }

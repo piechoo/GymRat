@@ -3,7 +3,13 @@ import { View, StyleSheet, Dimensions } from 'react-native'
 
 import { Agenda, Calendar } from 'react-native-calendars'
 import { useCallback } from 'react'
-import { Appbar, Portal, Provider, Text } from 'react-native-paper'
+import {
+  ActivityIndicator,
+  Appbar,
+  Portal,
+  Provider,
+  Text,
+} from 'react-native-paper'
 import { useFocusEffect } from '@react-navigation/native'
 import Button from '../Components/Button'
 import firestore from '@react-native-firebase/firestore'
@@ -107,6 +113,13 @@ const FeedContainer = React.memo(
 
     return (
       <ScrollView>
+        {loading && (
+          <ActivityIndicator
+            animating={true}
+            size={'large'}
+            style={{ marginTop: 30 }}
+          />
+        )}
         {!loading &&
           Object.values(calendarWorkouts)?.map?.((work, i) => {
             return (
