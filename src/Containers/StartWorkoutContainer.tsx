@@ -10,6 +10,7 @@ import firestore from '@react-native-firebase/firestore'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import Modal from '../Components/Modal'
 import SimpleWorkoutPreview from '../Components/SimpleWorkoutPreview'
+import WorkoutContainer from './WorkoutContainer'
 
 const { height } = Dimensions.get('window')
 
@@ -26,6 +27,8 @@ const styles = StyleSheet.create({
 
 const StartWorkoutContainer = React.memo(({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(null)
+  const [workoutDate, setWorkoutDate] = useState(null)
+  const [startNew, setStartNew] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
   const [loading, setLoading] = useState(true)
   const { user } = useContext(AuthContext)
@@ -66,9 +69,35 @@ const StartWorkoutContainer = React.memo(({ navigation }) => {
       console.log(e)
     }
   }
+  const fetchToday = async () => {
+    try {
+      const today = new Date().toISOString().slice(0, 10)
+      await firestore()
+        .collection('workouts')
+        .where('userId', '==', user?.uid)
+        .where('day', '==', today)
+        .count()
+        .get()
+        .then(documentSnapshot => {
+          if (documentSnapshot.data().count > 0) {
+            // navigation.navigate('WorkoutCreator', {
+            //   dayToCopy: today,
+            // })
+            setWorkoutDate(today)
+          }
+        })
+
+      if (loading) {
+        setLoading(false)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   useEffect(() => {
     fetchWorkoutToCopy()
+    fetchToday()
     navigation.addListener('focus', () => setLoading(!loading))
   }, [navigation, loading])
 
@@ -80,6 +109,7 @@ const StartWorkoutContainer = React.memo(({ navigation }) => {
           navigation.navigate('WorkoutCreator', {
             dayToCopy: selectedDate,
           })
+          setWorkoutDate(selectedDate)
           setSelectedDate(null)
         }}
       >
@@ -92,16 +122,17 @@ const StartWorkoutContainer = React.memo(({ navigation }) => {
     <View style={styles.container}>
       <Button
         onPress={() => {
-          navigation.navigate('WorkoutCreator', {
-            dayToCopy: selectedDate,
-          })
+          // navigation.navigate('WorkoutCreator', {
+          //   dayToCopy: selectedDate,
+          // })
+          setStartNew(true)
         }}
       >
         <Text>Start new workout</Text>
       </Button>
       <Button
         onPress={() => {
-          setShowCalendar(true)
+          setShowCalendar(!showCalendar)
         }}
       >
         <Text>Choose from day</Text>
@@ -154,6 +185,12 @@ const StartWorkoutContainer = React.memo(({ navigation }) => {
           enableSwipeMonths={true}
         />
       )}
+      {(workoutDate || startNew) && (
+        <WorkoutContainer
+          navigation={navigation}
+          route={{ params: { dayToCopy: workoutDate } }}
+        />
+      )}
       {selectedDate && (
         <Portal>
           <Modal
@@ -163,15 +200,17 @@ const StartWorkoutContainer = React.memo(({ navigation }) => {
             // shouldStretch
             closeLabel="Close"
           >
-            <Appbar.Header>
-              <Appbar.BackAction
-                onPress={() => {
-                  setSelectedDate(null)
-                }}
-              />
-              <Appbar.Content title={'Workout to copy'} />
-            </Appbar.Header>
-            <SimpleWorkoutPreview workout={calendarWorkouts[selectedDate]} />
+            <>
+              <Appbar.Header>
+                <Appbar.BackAction
+                  onPress={() => {
+                    setSelectedDate(null)
+                  }}
+                />
+                <Appbar.Content title={'Workout to copy'} />
+              </Appbar.Header>
+              <SimpleWorkoutPreview workout={calendarWorkouts[selectedDate]} />
+            </>
           </Modal>
         </Portal>
       )}

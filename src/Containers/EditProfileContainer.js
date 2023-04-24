@@ -224,14 +224,13 @@ const EditProfileScreen = () => {
               }}
             >
               <ImageBackground
-                source={{
-                  uri: image
-                    ? image
-                    : userData
-                    ? userData.userImg ||
-                      'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg'
-                    : 'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg',
-                }}
+                source={
+                  userData?.userImg
+                    ? {
+                        uri: userData.userImg,
+                      }
+                    : require('../Assets/Images/avatar.png')
+                }
                 style={{ height: 100, width: 100 }}
                 imageStyle={{ borderRadius: 15 }}
               >
@@ -297,7 +296,7 @@ const EditProfileScreen = () => {
             style={[styles.textInput, { height: 40 }]}
           />
         </View>
-        <View style={styles.action}>
+        {/* <View style={styles.action}>
           <Feather name="phone" size={20} />
           <TextInput
             placeholder="Phone"
@@ -328,8 +327,8 @@ const EditProfileScreen = () => {
             onChangeText={txt => setUserData({ ...userData, city: txt })}
             style={styles.textInput}
           />
-        </View>
-        <Button mode="elevated" style={styles.button} onPress={handleUpdate}>
+        </View> */}
+        <Button mode="outlined" style={styles.button} onPress={handleUpdate}>
           {t(`Update`)}
         </Button>
       </Animated.View>

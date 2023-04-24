@@ -112,7 +112,7 @@ const FeedContainer = React.memo(
     }, [navigation, loading])
 
     return (
-      <ScrollView>
+      <ScrollView style={{ width: '100%' }}>
         {loading && (
           <ActivityIndicator
             animating={true}

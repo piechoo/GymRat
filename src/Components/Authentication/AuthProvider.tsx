@@ -167,6 +167,9 @@ export const AuthProvider = ({ children }: Props) => {
                     createdAt: firestore.Timestamp.fromDate(new Date()),
                     userImg: null,
                   })
+                  .then(() => {
+                    auth().signInWithEmailAndPassword(email, password)
+                  })
                   //ensure we catch any errors at this stage to advise us if something does go wrong
                   .catch(error => {
                     console.log(

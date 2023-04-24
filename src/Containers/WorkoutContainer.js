@@ -74,7 +74,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         userId: user.uid,
         day: currentDay ?? new Date().toISOString().slice(0, 10),
         excercises: excercises,
-        // postImg: imageUrl,
         postTime: firestore.Timestamp.fromDate(new Date()),
         tags: tags,
         load: load,
@@ -82,12 +81,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         comments: null,
       })
       .then(() => {
-        // console.log('Post Added!')
-        // Alert.alert(
-        //   'Post published!',
-        //   'Your post has been published Successfully!',
-        // )
-        // setPost(null)
         navigation.navigate('Feed')
       })
       .catch(error => {
@@ -98,70 +91,9 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const { Layout } = useTheme()
   const { t } = useTranslation()
 
-  // const workout = useSelector((state: AppState) =>
-  //   getUserDayWorkout(state, date),
-  // )
-
   const [isFabOpen, setIsFabOpen] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
-  // const [selectedExcercises, setSelectedExcercises] = useState(
-  //   workout?.excercises ?? [],
-  // )
-
-  // useEffect(() => {
-  //   setSelectedExcercises(workout?.excercises ?? [])
-  // }, [workout?.excercises])
-  const dispatch = useDispatch()
-
-  // const addExercises = useCallback(() => {
-  //   const newExcercises = workout?.excercises ?? []
-  //   const filteredSelected = selectedExcercises.filter(
-  //     obj => !newExcercises.find(o => o.name === obj.name),
-  //   )
-  //   const exercisesWithNew = newExcercises.concat(
-  //     filteredSelected.map(ex => ({ ...ex, ...defaultExcerciseValues })),
-  //   )
-  //   const newWorkout = { ...workout, excercises: exercisesWithNew, date }
-  //   if (workout) dispatch(editUserWorkout({ date, workout: newWorkout }))
-  //   else dispatch(addUserWorkout({ workout: newWorkout }))
-  //   setIsModalVisible(false)
-  // }, [workout, date, selectedExcercises])
-
-  // const removeExercise = useCallback(
-  //   excercise => {
-  //     const newExcercises = workout?.excercises ?? []
-  //     const filtered = newExcercises.filter(obj => obj.id !== excercise.id)
-  //     const newWorkout = { ...workout, excercises: filtered, date }
-  //     dispatch(editUserWorkout({ date, workout: newWorkout }))
-  //   },
-  //   [workout, date, selectedExcercises],
-  // )
-
-  // const addSerie = useCallback(
-  //   (excercise, serie) => {
-  //     const newExcercises = workout?.excercises ?? []
-  //     const filtered = newExcercises.map(obj => {
-  //       if (obj.id !== excercise.id) return obj
-  //       const copy = { ...obj }
-  //       copy.sets = [...copy.sets, serie]
-  //       return copy
-  //     })
-  //     const newWorkout = { ...workout, excercises: filtered, date }
-
-  //     dispatch(editUserWorkout({ date, workout: newWorkout }))
-  //   },
-  //   [workout],
-  // )
-
   const onStateChange = ({ open }) => setIsFabOpen(open)
-
-  // const addExcercisesButton = useMemo(() => {
-  //   return selectedExcercises ? (
-  //     <Button mode="text" onPress={addExercises} style={styles.addButton}>
-  //       {t(`shared.add`)}
-  //     </Button>
-  //   ) : undefined
-  // }, [addExercises, selectedExcercises])
 
   const addExcerciseSerie = useCallback((excercise, serie) => {
     setExcercises(state => {
@@ -212,7 +144,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
       <ScrollView style={[Layout.fill, Layout.column]}>
         {excercises?.map(ex => (
           <WorkoutExcercise
-            // date={date}
             excercise={ex}
             removeExercise={removeExercise}
             addSerie={addExcerciseSerie}
@@ -221,7 +152,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
             key={ex.name}
           />
         ))}
-        <Button onPress={submitWorkout}> ZAPISZ WOKROUIT</Button>
+        <Button onPress={submitWorkout}>Save workout</Button>
       </ScrollView>
       <Portal>
         <FAB.Group
