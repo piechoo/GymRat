@@ -22,6 +22,7 @@ const Button = ({
   fullWidth = true,
   children,
   width,
+  labelStyle,
 }: Props) => {
   return (
     <PaperButton
@@ -31,6 +32,7 @@ const Button = ({
         fullWidth ? styles.fullWidth : {},
         width ? { width: width } : {},
       ]}
+      labelStyle={labelStyle}
       onPress={onPress}
       buttonColor={buttonColor}
       textColor={textColor}

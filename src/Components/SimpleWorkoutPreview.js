@@ -15,6 +15,8 @@ import { Card, Chip, Text, useTheme } from 'react-native-paper'
 import { getBodypartColor } from '../Store/Excercises/consts'
 import firestore from '@react-native-firebase/firestore'
 import { navigate } from '../Navigators/utils'
+import SimpleUserPreview from './SimpleUserPreview'
+import Button from './Button'
 
 // {
 //         userId: user.uid,
@@ -38,6 +40,7 @@ const styles = StyleSheet.create({
   setButton: { flexDirection: 'column', padding: 5, borderRadius: 10 },
   modalContent: { paddingHorizontal: 20 },
   divider: { padding: 5 },
+  saveButtonLabel: { fontWeight: '600', fontSize: 20 },
 })
 const SimpleWorkoutPreview = ({ workout }) => {
   const [userData, setUserData] = useState(null)
@@ -64,46 +67,7 @@ const SimpleWorkoutPreview = ({ workout }) => {
   return (
     <Card style={styles.card} mode={'contained'}>
       {workout.userId && (
-        <View
-          style={{
-            marginLeft: 10,
-            marginTop: 10,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <TouchableOpacity
-            onPress={() =>
-              navigate('Profile', {
-                userId: workout.userId,
-              })
-            }
-            style={{
-              marginLeft: 10,
-              marginTop: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <Image
-              style={{
-                height: 50,
-                width: 50,
-                borderRadius: 50,
-              }}
-              source={
-                userData?.userImg
-                  ? {
-                      uri: userData?.userImg,
-                    }
-                  : require('../Assets/Images/avatar.png')
-              }
-            />
-            <Text variant="titleLarge" style={{ paddingLeft: 10 }}>
-              {userData?.fname} {userData?.lname}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <SimpleUserPreview userId={workout.userId} date={workout.day} />
       )}
 
       <Card.Content>
@@ -137,6 +101,20 @@ const SimpleWorkoutPreview = ({ workout }) => {
             )
           })}
         </View>
+        <Button
+          onPress={() => {
+            navigate('Workout', {
+              dayToCopy: workout.day,
+              userId: workout.userId,
+            })
+          }}
+          labelStyle={styles.saveButtonLabel}
+          // weight={20}
+          // fullWidth={false}
+          mode="contained"
+        >
+          Preview
+        </Button>
       </Card.Content>
     </Card>
   )

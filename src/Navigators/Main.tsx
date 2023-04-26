@@ -62,7 +62,7 @@ const MainNavigator = ({ navigation }) => {
         />
         <Tab.Screen
           name="Workout"
-          component={StartWorkoutContainer}
+          component={WorkoutContainer}
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',

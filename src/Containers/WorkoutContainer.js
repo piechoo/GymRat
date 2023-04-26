@@ -7,7 +7,7 @@ import {
   editUserWorkout,
   getUserDayWorkout,
 } from '@/Store/User'
-import { Button, FAB, Portal } from 'react-native-paper'
+import { ActivityIndicator, Appbar, FAB, Portal } from 'react-native-paper'
 import { useState } from 'react'
 import Modal from '@/Components/Modal'
 import ExcercisesList from './ExcercisesList'
@@ -21,32 +21,102 @@ import firestore from '@react-native-firebase/firestore'
 import WorkoutExcercise from '../Components/WorkoutExcercise'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import { getTotalLoad, getWorkoutTags } from '../Store/Excercises/consts'
+import { Calendar } from 'react-native-calendars'
+import SimpleWorkoutPreview from '../Components/SimpleWorkoutPreview'
+import Button from '../Components/Button'
+import { useFocusEffect } from '@react-navigation/native'
+import SimpleUserPreview from '../Components/SimpleUserPreview'
 
 const styles = StyleSheet.create({
   addButton: { paddingHorizontal: 10, paddingVertical: 5 },
   container: { height: '100%' },
   fabGroup: { paddingBottom: 50 },
+  saveButtonWrapper: { paddingBottom: 20, width: '80%', alignSelf: 'center' },
+  saveButtonLabel: { fontWeight: '600', fontSize: 20 },
 })
 
 const WorkoutContainer = React.memo(({ route, navigation }) => {
-  const { currentDay, dayToCopy } = route.params
+  const { Layout } = useTheme()
+  const { t } = useTranslation()
   const { user } = useContext(AuthContext)
+  const currentDay = route?.params?.currentDay
+  const dayToCopy = route?.params?.dayToCopy
+  const userId = route?.params?.userId
+
+  const readOnly = userId && userId !== user.uid
+
+  const [isFabOpen, setIsFabOpen] = useState(false)
+  const [displayFab, setDisplayFab] = useState(false)
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isFromDayVisible, setIsFromDayVisible] = useState(false)
+  const onStateChange = ({ open }) => setIsFabOpen(open)
+  const [calendarWorkouts, setCalendarWorkouts] = useState({})
+  const [selectedDate, setSelectedDate] = useState(null)
+  const onSelectDate = useCallback(day => {
+    setSelectedDate(day?.dateString)
+  }, [])
   const [excercises, setExcercises] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (dayToCopy) {
-      fetchWorkoutToCopy()
-      navigation.addListener('focus', () => setLoading(!loading))
-    }
+    fetchCalendarWorkouts()
+    navigation.addListener('focus', () => setLoading(!loading))
   }, [navigation, loading, dayToCopy])
 
-  const fetchWorkoutToCopy = async () => {
+  useFocusEffect(
+    React.useCallback(() => {
+      today = new Date().toISOString().slice(0, 10)
+      if (dayToCopy) {
+        fetchWorkoutToCopy(dayToCopy)
+      } else fetchWorkoutToCopy(today)
+      setDisplayFab(true)
+      return () => {
+        setDisplayFab(false)
+        navigation.setParams({ userId: null })
+      }
+    }, [dayToCopy]),
+  )
+
+  const fetchCalendarWorkouts = async () => {
     try {
+      const list = {}
+      setLoading(true)
+
       await firestore()
         .collection('workouts')
         .where('userId', '==', user?.uid)
-        .where('day', '==', dayToCopy)
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            const { day, excercises, tags, load } = doc.data()
+            list[day] = {
+              day,
+              excercises,
+              tags,
+              load,
+              marked: true,
+              dotColor: 'red',
+            }
+          })
+        })
+      setCalendarWorkouts(list)
+
+      if (loading) {
+        setLoading(false)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const fetchWorkoutToCopy = async day => {
+    try {
+      setLoading(true)
+
+      await firestore()
+        .collection('workouts')
+        .where('userId', '==', userId ? userId : user.uid)
+        .where('day', '==', day)
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
@@ -81,19 +151,13 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         comments: null,
       })
       .then(() => {
+        setExcercises([])
         navigation.navigate('Feed')
       })
       .catch(error => {
         console.log('Something went wrong with added post to firestore.', error)
       })
   }
-
-  const { Layout } = useTheme()
-  const { t } = useTranslation()
-
-  const [isFabOpen, setIsFabOpen] = useState(false)
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const onStateChange = ({ open }) => setIsFabOpen(open)
 
   const addExcerciseSerie = useCallback((excercise, serie) => {
     setExcercises(state => {
@@ -139,8 +203,35 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     })
   }, [])
 
+  const selectDayButton = useMemo(() => {
+    return selectedDate ? (
+      <Button
+        mode="text"
+        fullWidth={false}
+        onPress={() => {
+          fetchWorkoutToCopy(selectedDate)
+          setSelectedDate(null)
+          setIsFromDayVisible(false)
+        }}
+      >
+        Select
+      </Button>
+    ) : null
+  }, [selectedDate])
+
   return (
     <View style={styles.container}>
+      <SimpleUserPreview
+        userId={userId ? userId : user.uid}
+        date={currentDay ?? new Date().toISOString().slice(0, 10)}
+      />
+      {loading && excercises.length === 0 && (
+        <ActivityIndicator
+          animating={true}
+          size={'large'}
+          style={{ marginTop: 30 }}
+        />
+      )}
       <ScrollView style={[Layout.fill, Layout.column]}>
         {excercises?.map(ex => (
           <WorkoutExcercise
@@ -152,13 +243,23 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
             key={ex.name}
           />
         ))}
-        <Button onPress={submitWorkout}>Save workout</Button>
+        <View style={styles.saveButtonWrapper}>
+          <Button
+            onPress={submitWorkout}
+            labelStyle={styles.saveButtonLabel}
+            // weight={20}
+            // fullWidth={false}
+            mode="contained"
+          >
+            Save workout
+          </Button>
+        </View>
       </ScrollView>
       <Portal>
         <FAB.Group
           open={isFabOpen}
           variant={'surface'}
-          visible
+          visible={displayFab}
           icon={isFabOpen ? 'close' : 'plus'}
           style={styles.fabGroup}
           actions={[
@@ -167,11 +268,11 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
               label: t(`workoutExcercise.addFromList`),
               onPress: () => setIsModalVisible(true),
             },
-            // {
-            //   icon: 'calendar-blank-multiple',
-            //   label: t(`workoutExcercise.addFromDay`),
-            //   onPress: () => console.log('Pressed star'),
-            // },
+            {
+              icon: 'calendar-blank-multiple',
+              label: t(`workoutExcercise.addFromDay`),
+              onPress: () => setIsFromDayVisible(true),
+            },
             // {
             //   icon: 'account-multiple-plus',
             //   label: t(`Add a friend`),
@@ -180,6 +281,39 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           ]}
           onStateChange={onStateChange}
         />
+        <Modal
+          isVisible={isFromDayVisible}
+          setVisible={setIsFromDayVisible}
+          buttons={selectDayButton}
+          // shouldStretch
+          closeLabel="Close"
+        >
+          <>
+            <Appbar.Header>
+              <Appbar.BackAction
+                onPress={() => {
+                  if (selectedDate) setSelectedDate(null)
+                  else setIsFromDayVisible(false)
+                }}
+              />
+              <Appbar.Content title={'Workout to copy'} />
+            </Appbar.Header>
+            {!selectedDate && (
+              <Calendar
+                markedDates={calendarWorkouts}
+                onDayPress={day => {
+                  if (calendarWorkouts[day?.dateString]) onSelectDate(day)
+                }}
+                firstDay={1}
+                disableAllTouchEventsForDisabledDays={true}
+                enableSwipeMonths={true}
+              />
+            )}
+            {selectedDate && (
+              <SimpleWorkoutPreview workout={calendarWorkouts[selectedDate]} />
+            )}
+          </>
+        </Modal>
 
         <Modal
           isVisible={isModalVisible}
