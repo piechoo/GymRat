@@ -95,6 +95,7 @@ const SimpleWorkoutPreview = ({ workout }) => {
                   marginRight: 5,
                 }}
                 textStyle={{ color: 'white' }}
+                key={workout.day + i}
               >
                 {tag.name}
               </Chip>

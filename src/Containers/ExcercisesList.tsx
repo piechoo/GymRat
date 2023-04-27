@@ -44,7 +44,7 @@ const ExcercisesList = ({
             selectedBodypart ? t(`bodyparts.${selectedBodypart}`) : 'Bodyparts'
           }
         />
-        <Appbar.Action icon="magnify" onPress={() => {}} />
+        {/* <Appbar.Action icon="magnify" onPress={() => {}} /> */}
       </Appbar.Header>
       {!selectedBodypart && (
         <FlatList

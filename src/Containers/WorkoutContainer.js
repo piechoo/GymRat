@@ -7,7 +7,13 @@ import {
   editUserWorkout,
   getUserDayWorkout,
 } from '@/Store/User'
-import { ActivityIndicator, Appbar, FAB, Portal } from 'react-native-paper'
+import {
+  ActivityIndicator,
+  Appbar,
+  FAB,
+  Portal,
+  Text,
+} from 'react-native-paper'
 import { useState } from 'react'
 import Modal from '@/Components/Modal'
 import ExcercisesList from './ExcercisesList'
@@ -41,9 +47,11 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const { user } = useContext(AuthContext)
   const currentDay = route?.params?.currentDay
   const dayToCopy = route?.params?.dayToCopy
-  const userId = route?.params?.userId
+  // const userId = route?.params?.userId
 
-  const readOnly = userId && userId !== user.uid
+  const userId = route?.params?.userId ? route?.params?.userId : user.uid
+
+  const readOnly = userId !== user.uid
 
   const [isFabOpen, setIsFabOpen] = useState(false)
   const [displayFab, setDisplayFab] = useState(false)
@@ -59,20 +67,22 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchCalendarWorkouts()
-    navigation.addListener('focus', () => setLoading(!loading))
-  }, [navigation, loading, dayToCopy])
+    setExcercises([])
+  }, [userId, dayToCopy])
 
   useFocusEffect(
     React.useCallback(() => {
+      // setLoading(true)
       today = new Date().toISOString().slice(0, 10)
       if (dayToCopy) {
         fetchWorkoutToCopy(dayToCopy)
       } else fetchWorkoutToCopy(today)
+      fetchCalendarWorkouts()
+
       setDisplayFab(true)
       return () => {
         setDisplayFab(false)
-        navigation.setParams({ userId: null })
+        navigation.setParams({ userId: null, dayToCopy: null })
       }
     }, [dayToCopy]),
   )
@@ -80,7 +90,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const fetchCalendarWorkouts = async () => {
     try {
       const list = {}
-      setLoading(true)
+      // setLoading(true)
 
       await firestore()
         .collection('workouts')
@@ -102,7 +112,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
       setCalendarWorkouts(list)
 
       if (loading) {
-        setLoading(false)
+        // setLoading(false)
       }
     } catch (e) {
       console.log(e)
@@ -115,7 +125,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
 
       await firestore()
         .collection('workouts')
-        .where('userId', '==', userId ? userId : user.uid)
+        .where('userId', '==', userId)
         .where('day', '==', day)
         .get()
         .then(querySnapshot => {
@@ -126,9 +136,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           })
         })
 
-      if (loading) {
-        setLoading(false)
-      }
+      setLoading(false)
     } catch (e) {
       console.log(e)
     }
@@ -222,7 +230,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <SimpleUserPreview
-        userId={userId ? userId : user.uid}
+        userId={userId}
         date={currentDay ?? new Date().toISOString().slice(0, 10)}
       />
       {loading && excercises.length === 0 && (
@@ -232,6 +240,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           style={{ marginTop: 30 }}
         />
       )}
+
       <ScrollView style={[Layout.fill, Layout.column]}>
         {excercises?.map(ex => (
           <WorkoutExcercise
@@ -241,25 +250,36 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
             editSerie={editExcerciseSerie}
             removeSerie={removeExcerciseSerie}
             key={ex.name}
+            readOnly={readOnly}
           />
         ))}
-        <View style={styles.saveButtonWrapper}>
-          <Button
-            onPress={submitWorkout}
-            labelStyle={styles.saveButtonLabel}
-            // weight={20}
-            // fullWidth={false}
-            mode="contained"
-          >
-            Save workout
-          </Button>
-        </View>
+        {!readOnly && (
+          <View style={styles.saveButtonWrapper}>
+            {!loading &&
+              (excercises.length === 0 ? (
+                <Text
+                  variant="titleLarge"
+                  style={{ paddingVertical: 30, textAlign: 'center' }}
+                >
+                  Create new Workout!
+                </Text>
+              ) : (
+                <Button
+                  onPress={submitWorkout}
+                  labelStyle={styles.saveButtonLabel}
+                  mode="contained"
+                >
+                  Save workout
+                </Button>
+              ))}
+          </View>
+        )}
       </ScrollView>
       <Portal>
         <FAB.Group
           open={isFabOpen}
           variant={'surface'}
-          visible={displayFab}
+          visible={displayFab && !readOnly}
           icon={isFabOpen ? 'close' : 'plus'}
           style={styles.fabGroup}
           actions={[

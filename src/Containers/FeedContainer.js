@@ -44,6 +44,7 @@ const FeedContainer = React.memo(
           await firestore()
             .collection('workouts')
             .where('userId', '==', userId)
+            .orderBy('postTime', 'desc')
             .get()
             .then(querySnapshot => {
               querySnapshot.forEach(doc => {
@@ -63,6 +64,7 @@ const FeedContainer = React.memo(
           await firestore()
             .collection('workouts')
             .where('userId', 'in', user.followed)
+            .orderBy('postTime', 'desc')
             .get()
             .then(querySnapshot => {
               querySnapshot.forEach(doc => {
@@ -81,6 +83,7 @@ const FeedContainer = React.memo(
         } else
           await firestore()
             .collection('workouts')
+            .orderBy('postTime', 'desc')
             .get()
             .then(querySnapshot => {
               querySnapshot.forEach(doc => {
