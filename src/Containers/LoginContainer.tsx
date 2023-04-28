@@ -67,14 +67,14 @@ const LoginScreen = ({ navigation }) => {
         secureTextEntry={true}
       />
       <HelperText type="error" visible={isErrorVisible}>
-        {t(`Please fill required data`)}
+        {t(`Please fill correct data`)}
       </HelperText>
 
       <Button
         mode="elevated"
         onPress={() => {
           if (!email || !password) setIsErrorVisible(true)
-          else login?.(email, password)
+          else login?.(email, password, () => setIsErrorVisible(true))
         }}
       >
         {t(`Sign In`)}

@@ -1,3 +1,5 @@
+import { BestLift, WorkoutExcercise } from '../types'
+
 const execiseType = {
   weight: 'weight - reps',
   distance: 'distance - time',
@@ -14,7 +16,32 @@ export enum bodyParts {
   biceps = 'biceps',
   triceps = 'triceps',
   abs = 'abs',
-  cardio = 'cardio',
+  // cardio = 'cardio',
+}
+
+export const findNewBestLifts = (
+  excercisesList: Array<WorkoutExcercise>,
+  currentBestLifts: Array<BestLift>,
+): Array<BestLift> => {
+  const newBestLifts: Array<BestLift> = []
+  excercisesList.forEach(ex => {
+    let biggestLiftInSet = 0
+    ex.sets.forEach(element => {
+      if (element.weight > biggestLiftInSet) biggestLiftInSet = element.weight
+    })
+    newBestLifts.push({ id: ex.id, value: biggestLiftInSet })
+  })
+
+  const bestWithoutBetter = newBestLifts.filter(
+    el =>
+      !currentBestLifts.find(
+        curr => curr.id === el.id && curr.value > el.value,
+      ),
+  )
+
+  return currentBestLifts
+    .filter(curr => !bestWithoutBetter.find(el => el.id === curr.id))
+    .concat(bestWithoutBetter)
 }
 
 export const getBodypartColor = bodypart => {
@@ -179,10 +206,10 @@ export const excercises = {
     { name: 'Lying dumbell extension', type: execiseType.weight, id: 67 },
     { name: 'Cable triceps extension', type: execiseType.weight, id: 68 },
   ],
-  [bodyParts.cardio]: [
-    { name: 'Treadmill', type: execiseType.distance, id: 69 },
-    { name: 'Bicycle', type: execiseType.distance, id: 70 },
-    { name: 'Stepper', type: execiseType.distance, id: 71 },
-    { name: 'Steps', type: execiseType.distance, id: 72 },
-  ],
+  // [bodyParts.cardio]: [
+  //   { name: 'Treadmill', type: execiseType.distance, id: 69 },
+  //   { name: 'Bicycle', type: execiseType.distance, id: 70 },
+  //   { name: 'Stepper', type: execiseType.distance, id: 71 },
+  //   { name: 'Steps', type: execiseType.distance, id: 72 },
+  // ],
 }

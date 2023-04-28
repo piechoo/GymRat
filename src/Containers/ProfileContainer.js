@@ -70,7 +70,7 @@ import Modal from '../Components/Modal'
 import UsersList from '../Components/UsersList'
 
 export const ProfileContainer = ({ navigation, route }) => {
-  const { user, logout } = useContext(AuthContext)
+  const { user, logout, setUser } = useContext(AuthContext)
   const { t } = useTranslation()
 
   const [posts, setPosts] = useState([])
@@ -143,6 +143,10 @@ export const ProfileContainer = ({ navigation, route }) => {
           .update({
             followed: firestore.FieldValue.arrayUnion(route.params.userId),
           })
+        setUser({
+          ...user,
+          followed: [...user.followed, route.params.userId],
+        })
       } else {
         firestore()
           .collection('users')
@@ -156,6 +160,10 @@ export const ProfileContainer = ({ navigation, route }) => {
           .update({
             followed: firestore.FieldValue.arrayRemove(route.params.userId),
           })
+        setUser({
+          ...user,
+          followed: user.followed.filter(usr => usr !== route.params.userId),
+        })
       }
     }
   }

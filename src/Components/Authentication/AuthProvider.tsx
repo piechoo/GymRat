@@ -7,7 +7,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin'
 type AuthContextType = {
   user?: string
   setUser?: Function
-  login?: (email: string, password: string) => void
+  login?: (email: string, password: string, fallback: () => void) => void
   register?: (email: string, password: string) => void
   googleLogin?: () => any
   logout?: () => any
@@ -26,11 +26,16 @@ export const AuthProvider = ({ children }: Props) => {
       value={{
         user,
         setUser,
-        login: async (email: string, password: string) => {
+        login: async (
+          email: string,
+          password: string,
+          fallback: () => void,
+        ) => {
           try {
             await auth().signInWithEmailAndPassword(email, password)
           } catch (e) {
             console.log(e)
+            fallback()
           }
         },
         googleLogin: async () => {

@@ -1,17 +1,44 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { getUserExcerciseHistory } from '@/Store/User'
 import { useMemo } from 'react'
 import { memo } from 'react'
-import { Dimensions, Text, View } from 'react-native'
+import {
+  Dimensions,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from 'react-native'
 import { LineChart } from 'react-native-chart-kit'
-import { useSelector } from 'react-redux'
 import firestore from '@react-native-firebase/firestore'
-import { useTheme } from 'react-native-paper'
+import { useTheme, Text } from 'react-native-paper'
 import { AuthContext } from './Authentication/AuthProvider'
+import { navigate } from '../Navigators/utils'
 
 interface Props {
   excerciseId: number
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginLeft: 10,
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  button: {
+    marginLeft: 10,
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  image: {
+    height: 50,
+    width: 50,
+    borderRadius: 50,
+  },
+  labelsContainer: { paddingLeft: 10 },
+})
 
 const ExcerciseDetails = memo(({ excerciseId }: Props) => {
   const { user } = useContext(AuthContext)
@@ -20,9 +47,11 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
     values: [],
     reps: [],
   })
+  const [followedBest, setFollowedBest] = useState([])
 
   useEffect(() => {
     getHistoricalExcercises()
+    getFollowedBestLifts()
   }, [])
 
   const getHistoricalExcercises = async () => {
@@ -61,6 +90,28 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
 
         setHistoricalExcercises(list)
       })
+  }
+  const getFollowedBestLifts = async () => {
+    const bestLiftsCollection = []
+    await firestore()
+      .collection('users')
+      .where('__name__', 'in', user?.followed)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const { bestLifts, fname, lname, userImg } = doc.data()
+          const bestLiftInEx = bestLifts?.find?.(el => el.id === excerciseId)
+          const usrId = doc.id
+          if (bestLiftInEx)
+            bestLiftsCollection.push({
+              name: `${fname} ${lname}`,
+              value: bestLiftInEx.value,
+              userId: usrId,
+              userImg,
+            })
+        })
+      })
+    setFollowedBest(bestLiftsCollection)
   }
 
   // const historicalExcrecises = useSelector(state =>
@@ -105,18 +156,11 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
 
   return (
     <View>
-      {/* {historicalExcrecises.map(ex => {
-        return (
-          <Text>
-            {ex.date} - {Math.max(...ex.excercise.sets.map(o => o.weight))}
-          </Text>
-        )
-      })} */}
       {data.labels.length > 0 ? (
         <LineChart
           data={data}
           width={Dimensions.get('window').width - 60}
-          height={220}
+          height={200}
           chartConfig={{
             //   backgroundColor: '#fb8c00',
             backgroundGradientFrom: theme.colors.background,
@@ -133,61 +177,57 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
               color: theme.colors.primaryContainer,
             },
           }}
-          // bezier
-          verticalLabelRotation={90}
-          style={{
-            paddingBottom: 60,
-            borderRadius: 16,
-          }}
+          formatXLabel={val => val.slice(5)}
         />
       ) : null}
-      {/* <LineChart
-        data={{
-          labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-          datasets: [
-            {
-              data: [
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-              ],
-            },
-          ],
-        }}
-        width={Dimensions.get('window').width} // from react-native
-        height={220}
-        yAxisLabel="$"
-        yAxisSuffix="k"
-        yAxisInterval={1} // optional, defaults to 1
-        chartConfig={{
-          backgroundColor: '#e26a00',
-          backgroundGradientFrom: '#fb8c00',
-          backgroundGradientTo: '#ffa726',
-          decimalPlaces: 2, // optional, defaults to 2dp
-          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-          propsForDots: {
-            r: '6',
-            strokeWidth: '2',
-            stroke: '#ffa726',
-          },
-        }}
-        bezier
-        style={{
-          marginVertical: 8,
-          borderRadius: 16,
-        }}
-      /> */}
-      <Text>
-        Estimated one rep max:
+      <Text
+        variant="titleSmall"
+        style={[styles.labelsContainer, { textAlign: 'center' }]}
+      >
+        Current estimated one rep max:
         {data.oneRepMax} KG
       </Text>
+      {followedBest.length > 0 && (
+        <>
+          <Text
+            variant="titleLarge"
+            style={[styles.labelsContainer, { textAlign: 'center' }]}
+          >
+            Followed heaviest lifts:
+          </Text>
+          <ScrollView>
+            {followedBest.map(el => {
+              return (
+                <View style={styles.container}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigate('Profile', {
+                        userId: el.userId,
+                      })
+                    }
+                    style={styles.button}
+                  >
+                    <Image
+                      style={styles.image}
+                      source={
+                        el?.userImg
+                          ? {
+                              uri: el?.userImg,
+                            }
+                          : require('../Assets/Images/avatar.png')
+                      }
+                    />
+                    <View style={styles.labelsContainer}>
+                      <Text variant="labelMedium">{el.name}</Text>
+                      <Text variant="labelSmall">{el.value} KG</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )
+            })}
+          </ScrollView>
+        </>
+      )}
     </View>
   )
 })

@@ -240,7 +240,7 @@ const WorkoutExcercise = ({
             <Modal
               isVisible={isInfoVisible}
               setVisible={setIsInfoVisible}
-              buttons={saveSerie}
+              // buttons={saveSerie}
             >
               <>
                 <Appbar.Header>

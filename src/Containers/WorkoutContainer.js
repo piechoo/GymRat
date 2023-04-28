@@ -26,7 +26,11 @@ import firestore from '@react-native-firebase/firestore'
 
 import WorkoutExcercise from '../Components/WorkoutExcercise'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
-import { getTotalLoad, getWorkoutTags } from '../Store/Excercises/consts'
+import {
+  findNewBestLifts,
+  getTotalLoad,
+  getWorkoutTags,
+} from '../Store/Excercises/consts'
 import { Calendar } from 'react-native-calendars'
 import SimpleWorkoutPreview from '../Components/SimpleWorkoutPreview'
 import Button from '../Components/Button'
@@ -44,7 +48,7 @@ const styles = StyleSheet.create({
 const WorkoutContainer = React.memo(({ route, navigation }) => {
   const { Layout } = useTheme()
   const { t } = useTranslation()
-  const { user } = useContext(AuthContext)
+  const { user, setUser } = useContext(AuthContext)
   const currentDay = route?.params?.currentDay
   const dayToCopy = route?.params?.dayToCopy
   // const userId = route?.params?.userId
@@ -65,6 +69,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   }, [])
   const [excercises, setExcercises] = useState([])
   const [loading, setLoading] = useState(true)
+  const [editedWorkoutId, setEditedWorkoutId] = useState(null)
 
   useEffect(() => {
     setExcercises([])
@@ -82,6 +87,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
       setDisplayFab(true)
       return () => {
         setDisplayFab(false)
+        setEditedWorkoutId(null)
         navigation.setParams({ userId: null, dayToCopy: null })
       }
     }, [dayToCopy]),
@@ -131,7 +137,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
             const { excercises } = doc.data()
-
+            setEditedWorkoutId(doc.id)
             setExcercises(excercises)
           })
         })
@@ -145,26 +151,54 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const submitWorkout = async () => {
     const tags = getWorkoutTags(excercises)
     const load = getTotalLoad(excercises)
+    const newBestLifts = findNewBestLifts(excercises, user.bestLifts ?? [])
 
-    firestore()
-      .collection('workouts')
-      .add({
-        userId: user.uid,
-        day: currentDay ?? new Date().toISOString().slice(0, 10),
-        excercises: excercises,
-        postTime: firestore.Timestamp.fromDate(new Date()),
-        tags: tags,
-        load: load,
-        likes: null,
-        comments: null,
+    await firestore()
+      .collection('users')
+      .doc(user.uid)
+      .update({
+        bestLifts: newBestLifts,
       })
       .then(() => {
-        setExcercises([])
-        navigation.navigate('Feed')
+        setUser?.({ ...user, bestLifts: newBestLifts })
       })
-      .catch(error => {
-        console.log('Something went wrong with added post to firestore.', error)
-      })
+
+    if (editedWorkoutId)
+      firestore()
+        .collection('workouts')
+        .doc(editedWorkoutId)
+        .update({
+          excercises: excercises,
+          tags: tags,
+          load: load,
+        })
+        .then(() => {
+          setExcercises([])
+          navigation.navigate('Feed')
+        })
+    else
+      firestore()
+        .collection('workouts')
+        .add({
+          userId: user.uid,
+          day: currentDay ?? new Date().toISOString().slice(0, 10),
+          excercises: excercises,
+          postTime: firestore.Timestamp.fromDate(new Date()),
+          tags: tags,
+          load: load,
+          likes: null,
+          comments: null,
+        })
+        .then(() => {
+          setExcercises([])
+          navigation.navigate('Feed')
+        })
+        .catch(error => {
+          console.log(
+            'Something went wrong with added post to firestore.',
+            error,
+          )
+        })
   }
 
   const addExcerciseSerie = useCallback((excercise, serie) => {
@@ -269,7 +303,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
                   labelStyle={styles.saveButtonLabel}
                   mode="contained"
                 >
-                  Save workout
+                  {editedWorkoutId ? 'Update Workout' : 'Save workout'}
                 </Button>
               ))}
           </View>

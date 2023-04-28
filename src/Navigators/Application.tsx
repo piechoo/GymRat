@@ -32,10 +32,10 @@ const ApplicationNavigator = () => {
         .get()
         .then(documentSnapshot => {
           if (documentSnapshot.exists) {
-            const { followed, followedBy } = documentSnapshot.data()
+            const { followed, followedBy, bestLifts } = documentSnapshot.data()
 
             console.log({ ...user._user, followed, followedBy })
-            setUser?.({ ...user._user, followed, followedBy })
+            setUser?.({ ...user._user, followed, followedBy, bestLifts })
           }
 
           // setUser?.(userData)
