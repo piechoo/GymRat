@@ -168,116 +168,114 @@ export const ProfileContainer = ({ navigation, route }) => {
     }
   }
 
+  const headerComponent = (
+    <View style={styles.container}>
+      <Image
+        style={styles.userImg}
+        source={
+          userData?.userImg
+            ? {
+                uri: userData.userImg,
+              }
+            : require('../Assets/Images/avatar.png')
+        }
+      />
+      <Text style={styles.userName}>
+        {userData ? userData.fname || 'New' : 'New'}{' '}
+        {userData ? userData.lname || 'User' : 'User'}
+      </Text>
+      {/* <Text>{route.params ? route.params.userId : user.uid}</Text> */}
+      <Text style={styles.aboutUser}>
+        {userData ? userData.about || 'No details added.' : ''}
+      </Text>
+      <View style={styles.userBtnWrapper}>
+        {route.params?.userId && route.params?.userId !== user.uid ? (
+          <>
+            <Button
+              mode="outlined"
+              width={'40%'}
+              fullWidth={false}
+              onPress={handleFollow}
+            >
+              {t(
+                !user?.followed?.includes?.(route.params.userId)
+                  ? `Follow`
+                  : 'Unfollow',
+              )}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              mode="outlined"
+              fullWidth={false}
+              width={'40%'}
+              onPress={() => {
+                navigation.navigate('EditProfile')
+              }}
+            >
+              {t(`Edit`)}
+            </Button>
+            <Button
+              width={'40%'}
+              mode="outlined"
+              fullWidth={false}
+              onPress={() => {
+                logout()
+                // navigation.navigate('Login')
+              }}
+            >
+              {t(`Logout`)}
+            </Button>
+          </>
+        )}
+      </View>
+
+      <View style={styles.userInfoWrapper}>
+        <View style={styles.userInfoItem}>
+          <Text style={styles.userInfoTitle}>{userWorkoutCount ?? 0}</Text>
+          <Text style={styles.userInfoSubTitle}>Workouts</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedUserIds(userData?.followedBy)
+            setIsModalVisible(true)
+            setModalTitle('Followers')
+          }}
+        >
+          <View style={styles.userInfoItem}>
+            <Text style={styles.userInfoTitle}>
+              {userData?.followedBy?.length ?? 0}
+            </Text>
+            <Text style={styles.userInfoSubTitle}>Followers</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedUserIds(userData?.followed)
+            setIsModalVisible(true)
+            setModalTitle('Following')
+          }}
+        >
+          <View style={styles.userInfoItem}>
+            <Text style={styles.userInfoTitle}>
+              {userData?.followed?.length ?? 0}
+            </Text>
+            <Text style={styles.userInfoSubTitle}>Following</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Image
-          style={styles.userImg}
-          source={
-            userData?.userImg
-              ? {
-                  uri: userData.userImg,
-                }
-              : require('../Assets/Images/avatar.png')
-          }
-        />
-        <Text style={styles.userName}>
-          {userData ? userData.fname || 'New' : 'New'}{' '}
-          {userData ? userData.lname || 'User' : 'User'}
-        </Text>
-        {/* <Text>{route.params ? route.params.userId : user.uid}</Text> */}
-        <Text style={styles.aboutUser}>
-          {userData ? userData.about || 'No details added.' : ''}
-        </Text>
-        <View style={styles.userBtnWrapper}>
-          {route.params?.userId && route.params?.userId !== user.uid ? (
-            <>
-              <Button
-                mode="outlined"
-                width={'40%'}
-                fullWidth={false}
-                onPress={handleFollow}
-              >
-                {t(
-                  !user?.followed?.includes?.(route.params.userId)
-                    ? `Follow`
-                    : 'Unfollow',
-                )}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                mode="outlined"
-                fullWidth={false}
-                width={'40%'}
-                onPress={() => {
-                  navigation.navigate('EditProfile')
-                }}
-              >
-                {t(`Edit`)}
-              </Button>
-              <Button
-                width={'40%'}
-                mode="outlined"
-                fullWidth={false}
-                onPress={() => {
-                  logout()
-                  // navigation.navigate('Login')
-                }}
-              >
-                {t(`Logout`)}
-              </Button>
-            </>
-          )}
-        </View>
+      <FeedContainer
+        headerComponent={headerComponent}
+        navigation={navigation}
+        userId={route.params?.userId ? route.params.userId : user.uid}
+      />
 
-        <View style={styles.userInfoWrapper}>
-          <View style={styles.userInfoItem}>
-            <Text style={styles.userInfoTitle}>{userWorkoutCount ?? 0}</Text>
-            <Text style={styles.userInfoSubTitle}>Workouts</Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedUserIds(userData?.followedBy)
-              setIsModalVisible(true)
-              setModalTitle('Followers')
-            }}
-          >
-            <View style={styles.userInfoItem}>
-              <Text style={styles.userInfoTitle}>
-                {userData?.followedBy?.length ?? 0}
-              </Text>
-              <Text style={styles.userInfoSubTitle}>Followers</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedUserIds(userData?.followed)
-              setIsModalVisible(true)
-              setModalTitle('Following')
-            }}
-          >
-            <View style={styles.userInfoItem}>
-              <Text style={styles.userInfoTitle}>
-                {userData?.followed?.length ?? 0}
-              </Text>
-              <Text style={styles.userInfoSubTitle}>Following</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <FeedContainer
-          navigation={navigation}
-          userId={route.params?.userId ? route.params.userId : user.uid}
-        />
-      </ScrollView>
       <Modal
         isVisible={isModalVisible}
         setVisible={setIsModalVisible}
@@ -296,8 +294,10 @@ export const ProfileContainer = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     // backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
   userImg: {

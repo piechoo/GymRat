@@ -70,6 +70,8 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const [excercises, setExcercises] = useState([])
   const [loading, setLoading] = useState(true)
   const [editedWorkoutId, setEditedWorkoutId] = useState(null)
+  const [isTodayWorkoutDone, setIsTodayWorkoutDone] = useState(false)
+  const isWorkoutSaved = (editedWorkoutId && dayToCopy) || isTodayWorkoutDone
 
   useEffect(() => {
     setExcercises([])
@@ -81,7 +83,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
       today = new Date().toISOString().slice(0, 10)
       if (dayToCopy) {
         fetchWorkoutToCopy(dayToCopy)
-      } else fetchWorkoutToCopy(today)
+      } else fetchWorkoutToCopy(today, true)
       fetchCalendarWorkouts()
 
       setDisplayFab(true)
@@ -125,7 +127,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     }
   }
 
-  const fetchWorkoutToCopy = async day => {
+  const fetchWorkoutToCopy = async (day, isToday) => {
     try {
       setLoading(true)
 
@@ -139,6 +141,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
             const { excercises } = doc.data()
             setEditedWorkoutId(doc.id)
             setExcercises(excercises)
+            setIsTodayWorkoutDone(isToday)
           })
         })
 
@@ -148,10 +151,30 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     }
   }
 
+  const deleteWorkout = async () => {
+    try {
+      setLoading(true)
+
+      await firestore()
+        .collection('workouts')
+        .doc(editedWorkoutId)
+        .delete()
+        .then(() => {
+          navigation.navigate('Feed')
+          setLoading(false)
+          setExcercises([])
+        })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const submitWorkout = async () => {
     const tags = getWorkoutTags(excercises)
     const load = getTotalLoad(excercises)
     const newBestLifts = findNewBestLifts(excercises, user.bestLifts ?? [])
+    setExcercises([])
+    setLoading(true)
 
     await firestore()
       .collection('users')
@@ -163,7 +186,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         setUser?.({ ...user, bestLifts: newBestLifts })
       })
 
-    if (editedWorkoutId)
+    if (isWorkoutSaved)
       firestore()
         .collection('workouts')
         .doc(editedWorkoutId)
@@ -173,7 +196,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           load: load,
         })
         .then(() => {
-          setExcercises([])
           navigation.navigate('Feed')
         })
     else
@@ -190,7 +212,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           comments: null,
         })
         .then(() => {
-          setExcercises([])
           navigation.navigate('Feed')
         })
         .catch(error => {
@@ -265,7 +286,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     <View style={styles.container}>
       <SimpleUserPreview
         userId={userId}
-        date={currentDay ?? new Date().toISOString().slice(0, 10)}
+        date={dayToCopy ?? new Date().toISOString().slice(0, 10)}
       />
       {loading && excercises.length === 0 && (
         <ActivityIndicator
@@ -303,7 +324,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
                   labelStyle={styles.saveButtonLabel}
                   mode="contained"
                 >
-                  {editedWorkoutId ? 'Update Workout' : 'Save workout'}
+                  {isWorkoutSaved ? 'Update Workout' : 'Save workout'}
                 </Button>
               ))}
           </View>
@@ -327,11 +348,15 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
               label: t(`workoutExcercise.addFromDay`),
               onPress: () => setIsFromDayVisible(true),
             },
-            // {
-            //   icon: 'account-multiple-plus',
-            //   label: t(`Add a friend`),
-            //   onPress: () => console.log('Pressed star'),
-            // },
+            ...(isWorkoutSaved
+              ? [
+                  {
+                    icon: 'delete-outline',
+                    label: t(`workoutExcercise.delete`),
+                    onPress: () => deleteWorkout(),
+                  },
+                ]
+              : []),
           ]}
           onStateChange={onStateChange}
         />

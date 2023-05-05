@@ -27,6 +27,7 @@ export default {
     setNumber: 'Set number',
     weight: 'Weight',
     reps: 'Reps',
+    setEmpty: 'Set number',
   },
   shared: {
     save: 'Save',
