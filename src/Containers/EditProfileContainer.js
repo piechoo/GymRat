@@ -8,9 +8,12 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native'
+
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Feather from 'react-native-vector-icons/Feather'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+
 import Animated from 'react-native-reanimated'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ImagePicker from 'react-native-image-crop-picker'
@@ -22,63 +25,26 @@ import { AuthContext } from '../Components/Authentication/AuthProvider'
 import { useTranslation } from 'react-i18next'
 
 const EditProfileScreen = () => {
-  const { user } = useContext(AuthContext)
+  const { user, logout } = useContext(AuthContext)
   const [image, setImage] = useState(null)
-  // const [uploading, setUploading] = useState(false)
-  // const [transferred, setTransferred] = useState(0)
+  const [uploading, setUploading] = useState(false)
+  const [transferred, setTransferred] = useState(0)
   const [userData, setUserData] = useState(null)
   const { t } = useTranslation()
 
-  const uploadImage = useCallback(async () => {
-    if (image == null) {
-      return null
-    }
-    const uploadUri = image
-    let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1)
+  const getUser = async () => {
+    const currentUser = await firestore()
+      .collection('users')
+      .doc(user.uid)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          setUserData(documentSnapshot.data())
+        }
+      })
+  }
 
-    // Add timestamp to File Name
-    const extension = filename.split('.').pop()
-    const name = filename.split('.').slice(0, -1).join('.')
-    filename = name + Date.now() + '.' + extension
-
-    // setUploading(true)
-    // setTransferred(0)
-
-    const storageRef = storage().ref(`photos/${filename}`)
-    const task = storageRef.putFile(uploadUri)
-
-    // Set transferred state
-    task.on('state_changed', taskSnapshot => {
-      console.log(
-        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-      )
-
-      // setTransferred(
-      //   Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
-      //     100,
-      // )
-    })
-
-    try {
-      await task
-
-      const url = await storageRef.getDownloadURL()
-
-      // setUploading(false)
-      setImage(null)
-
-      Alert.alert(
-        'Image uploaded!',
-        'Your image has been updated Successfully!',
-      )
-      return url
-    } catch (e) {
-      console.log(e)
-      return null
-    }
-  }, [])
-
-  const handleUpdate = useCallback(async () => {
+  const handleUpdate = async () => {
     let imgUrl = await uploadImage()
 
     if (imgUrl == null && userData.userImg) {
@@ -98,13 +64,65 @@ const EditProfileScreen = () => {
         userImg: imgUrl ?? '',
       })
       .then(() => {
-        console.log('User Updated!')
         Alert.alert(
           'Profile Updated!',
           'Your profile has been updated successfully.',
         )
       })
-  }, [user.uid, uploadImage])
+  }
+
+  const uploadImage = async () => {
+    if (image == null) {
+      return null
+    }
+    const uploadUri = image
+    let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1)
+
+    // Add timestamp to File Name
+    const extension = filename.split('.').pop()
+    const name = filename.split('.').slice(0, -1).join('.')
+    filename = name + Date.now() + '.' + extension
+
+    setUploading(true)
+    setTransferred(0)
+
+    const storageRef = storage().ref(`photos/${filename}`)
+    const task = storageRef.putFile(uploadUri)
+
+    // Set transferred state
+    task.on('state_changed', taskSnapshot => {
+      console.log(
+        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+      )
+
+      setTransferred(
+        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+          100,
+      )
+    })
+
+    try {
+      await task
+
+      const url = await storageRef.getDownloadURL()
+
+      setUploading(false)
+      setImage(null)
+
+      // Alert.alert(
+      //   'Image uploaded!',
+      //   'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
+      // );
+      return url
+    } catch (e) {
+      console.log(e)
+      return null
+    }
+  }
+
+  useEffect(() => {
+    getUser()
+  }, [])
 
   const takePhotoFromCamera = () => {
     ImagePicker.openCamera({
@@ -136,7 +154,7 @@ const EditProfileScreen = () => {
 
   renderInner = () => (
     <View style={styles.panel}>
-      <View style={styles.centeredContainer}>
+      <View style={{ alignItems: 'center' }}>
         <Text style={styles.panelTitle}>Upload Photo</Text>
         <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
       </View>
@@ -192,9 +210,17 @@ const EditProfileScreen = () => {
           opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),
         }}
       >
-        <View style={styles.centeredContainer}>
+        <View style={{ alignItems: 'center' }}>
           <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
-            <View style={styles.imageContainer}>
+            <View
+              style={{
+                height: 100,
+                width: 100,
+                borderRadius: 15,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
               <ImageBackground
                 source={
                   userData?.userImg
@@ -217,15 +243,23 @@ const EditProfileScreen = () => {
                     name="camera"
                     size={35}
                     color="#fff"
-                    style={styles.cameraIcon}
+                    style={{
+                      opacity: 0.7,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: 1,
+                      borderColor: '#fff',
+                      borderRadius: 10,
+                    }}
                   />
                 </View>
               </ImageBackground>
             </View>
           </TouchableOpacity>
-          <Text style={styles.userName}>
+          <Text style={{ marginTop: 10, fontSize: 18, fontWeight: 'bold' }}>
             {userData ? userData.fname : ''} {userData ? userData.lname : ''}
           </Text>
+          {/* <Text>{user.uid}</Text> */}
         </View>
 
         <View style={styles.action}>
@@ -252,12 +286,11 @@ const EditProfileScreen = () => {
           <Ionicons name="ios-clipboard-outline" size={20} />
           <TextInput
             multiline
-            numberOfLines={3}
             placeholder="About Me"
             value={userData ? userData.about : ''}
             onChangeText={txt => setUserData({ ...userData, about: txt })}
             autoCorrect={true}
-            style={[styles.textInput, { height: 40 }]}
+            style={[styles.textInput]}
           />
         </View>
         <Button mode="outlined" style={styles.button} onPress={handleUpdate}>
@@ -271,31 +304,8 @@ const EditProfileScreen = () => {
 export default EditProfileScreen
 
 const styles = StyleSheet.create({
-  centeredContainer: {
-    alignItems: 'center',
-  },
   container: {
     flex: 1,
-  },
-  userName: {
-    marginTop: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  imageContainer: {
-    height: 100,
-    width: 100,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cameraIcon: {
-    opacity: 0.7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#fff',
-    borderRadius: 10,
   },
   commandButton: {
     padding: 15,

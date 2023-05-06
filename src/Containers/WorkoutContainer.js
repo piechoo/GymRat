@@ -202,10 +202,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           navigation.navigate('Feed')
         })
         .catch(error => {
-          console.log(
-            'Something went wrong with added post to firestore.',
-            error,
-          )
+          console.log(error)
         })
   }, [excercises, user.bestLifts, user.uid, editedWorkoutId])
 

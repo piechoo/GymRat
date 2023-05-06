@@ -16,7 +16,6 @@ export enum bodyParts {
   biceps = 'biceps',
   triceps = 'triceps',
   abs = 'abs',
-  // cardio = 'cardio',
 }
 
 export const findNewBestLifts = (
@@ -206,10 +205,4 @@ export const excercises = {
     { name: 'Lying dumbell extension', type: execiseType.weight, id: 67 },
     { name: 'Cable triceps extension', type: execiseType.weight, id: 68 },
   ],
-  // [bodyParts.cardio]: [
-  //   { name: 'Treadmill', type: execiseType.distance, id: 69 },
-  //   { name: 'Bicycle', type: execiseType.distance, id: 70 },
-  //   { name: 'Stepper', type: execiseType.distance, id: 71 },
-  //   { name: 'Steps', type: execiseType.distance, id: 72 },
-  // ],
 }
