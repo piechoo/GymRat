@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { View, StyleSheet, FlatList } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { Appbar, Avatar, List, TextInput } from 'react-native-paper'
@@ -13,14 +13,14 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     backgroundColor: '#dbdbdb',
   },
+  textInput: { flexGrow: 1 },
 })
 
 const UsersList = ({ selectedUsersIds, setIsModalVisible, title }) => {
   const [users, setUsers] = useState([])
   const [search, setSearch] = useState('')
-  const { t } = useTranslation()
 
-  const getUser = async () => {
+  const getUser = useCallback(async () => {
     const usersArray = []
 
     if (selectedUsersIds) {
@@ -63,42 +63,34 @@ const UsersList = ({ selectedUsersIds, setIsModalVisible, title }) => {
         })
     }
     setUsers(usersArray)
-  }
+  }, [selectedUsersIds, search])
 
   useEffect(() => {
     if (selectedUsersIds) getUser()
   }, [selectedUsersIds])
 
+  const openModal = useCallback(() => setIsModalVisible(false), [])
+  const getUserFunction = useCallback(() => getUser(), [getUser])
+
   return (
     <View style={styles.container}>
       <Appbar.Header>
-        <Appbar.BackAction
-          onPress={() => {
-            setIsModalVisible(false)
-          }}
-        />
+        <Appbar.BackAction onPress={openModal} />
         {title ? (
           <Appbar.Content title={title} />
         ) : (
           <TextInput
             mode="outlined"
-            style={{ flexGrow: 1 }}
+            style={styles.textInput}
             label="User first or last name"
             value={search}
-            onChangeText={userEmail => setSearch(userEmail)}
+            onChangeText={setSearch}
             autoCapitalize="words"
             autoCorrect={false}
           />
         )}
 
-        {!title && (
-          <Appbar.Action
-            icon="magnify"
-            onPress={() => {
-              getUser()
-            }}
-          />
-        )}
+        {!title && <Appbar.Action icon="magnify" onPress={getUserFunction} />}
       </Appbar.Header>
       {users.length > 0 && (
         <FlatList

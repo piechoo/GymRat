@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { SafeAreaView, StatusBar, View } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native'
-import { ExampleContainer, StartupContainer } from '@/Containers'
+import { StartupContainer } from '@/Containers'
 import { useTheme } from '@/Hooks'
 import MainNavigator from './Main'
 import { navigationRef } from './utils'
@@ -33,8 +33,6 @@ const ApplicationNavigator = () => {
         .then(documentSnapshot => {
           if (documentSnapshot.exists) {
             const { followed, followedBy, bestLifts } = documentSnapshot.data()
-
-            console.log({ ...user._user, followed, followedBy })
             setUser?.({ ...user._user, followed, followedBy, bestLifts })
           }
 

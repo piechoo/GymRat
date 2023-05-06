@@ -1,23 +1,17 @@
 import React, { useState } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import {
-  AgendaContainer,
-  ExampleContainer,
-  ExcercisesListContainer,
-  WorkoutContainer,
-} from '@/Containers'
 import { View } from 'react-native'
 import { ProfileContainer } from '../Containers/ProfileContainer'
-import StartWorkoutContainer from '../Containers/StartWorkoutContainer'
 import FeedContainer from '../Containers/FeedContainer'
 import { IconButton } from 'react-native-paper'
 import Modal from '../Components/Modal'
 import UsersList from '../Components/UsersList'
+import { WorkoutContainer } from '../Containers'
 
 const Tab = createBottomTabNavigator()
 
 // @refresh reset
-const MainNavigator = ({ navigation }) => {
+const MainNavigator = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
 
   return (
@@ -28,23 +22,6 @@ const MainNavigator = ({ navigation }) => {
       }}
     >
       <Tab.Navigator>
-        {/* <Tab.Screen
-          name="Home"
-          component={ExampleContainer}
-          options={{
-            tabBarIconStyle: { display: 'none' },
-            tabBarLabelPosition: 'beside-icon',
-          }}
-        /> */}
-
-        {/* <Tab.Screen
-          name="Bodyparts"
-          component={ExcercisesListContainer}
-          options={{
-            tabBarIconStyle: { display: 'none' },
-            tabBarLabelPosition: 'beside-icon',
-          }}
-        /> */}
         <Tab.Screen
           name="Feed"
           component={FeedContainer}

@@ -11,7 +11,6 @@ export interface Excercises {
   [bodyParts.back]: Excercise[]
   [bodyParts.legs]: Excercise[]
   [bodyParts.shoulders]: Excercise[]
-  [bodyParts.cardio]: Excercise[]
   [bodyParts.biceps]: Excercise[]
   [bodyParts.triceps]: Excercise[]
   [bodyParts.abs]: Excercise[]

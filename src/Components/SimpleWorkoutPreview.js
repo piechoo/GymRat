@@ -1,34 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import {
-  ActivityIndicator,
-  View,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-} from 'react-native'
-import { useTranslation } from 'react-i18next'
-import { setDefaultTheme } from '@/Store/Theme'
-import { navigateAndSimpleReset } from '@/Navigators/utils'
+import React, { useCallback } from 'react'
+import { View, StyleSheet } from 'react-native'
 import WorkoutExcercise from './WorkoutExcercise'
-import { Layout } from '../Theme'
-import { Card, Chip, Text, useTheme } from 'react-native-paper'
+import { Card, Chip, Text } from 'react-native-paper'
 import { getBodypartColor } from '../Store/Excercises/consts'
-import firestore from '@react-native-firebase/firestore'
 import { navigate } from '../Navigators/utils'
 import SimpleUserPreview from './SimpleUserPreview'
 import Button from './Button'
-
-// {
-//         userId: user.uid,
-//         day: currentDay ?? new Date().toISOString().slice(0, 10),
-//         excercises: excercises,
-//         // postImg: imageUrl,
-//         postTime: firestore.Timestamp.fromDate(new Date()),
-//         tags: getWorkoutTags(excercises),
-//         load: getTotalLoad(excercises),
-//         likes: null,
-//         comments: null,
-//       }
 
 const styles = StyleSheet.create({
   saveButton: { paddingHorizontal: 10, paddingVertical: 5 },
@@ -41,35 +18,23 @@ const styles = StyleSheet.create({
   modalContent: { paddingHorizontal: 20 },
   divider: { padding: 5 },
   saveButtonLabel: { fontWeight: '600', fontSize: 20 },
+  chipTextStyle: { color: 'white' },
+  chipViewStyle: { flexDirection: 'row', paddingVertical: 10 },
 })
+
 const SimpleWorkoutPreview = ({ workout }) => {
-  const [userData, setUserData] = useState(null)
-
-  const getUser = async () => {
-    await firestore()
-      .collection('users')
-      .doc(workout.userId)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          setUserData(documentSnapshot.data())
-        }
-      })
-  }
-
-  useEffect(() => {
-    if (workout.userId) {
-      getUser()
-      // navigation.addListener('focus', () => setLoading(!loading))
-    }
-  }, [workout.userId])
+  const navigateToWorkout = useCallback(() => {
+    navigate('Workout', {
+      dayToCopy: workout.day,
+      userId: workout.userId,
+    })
+  }, [workout.day, workout.userId])
 
   return (
     <Card style={styles.card} mode={'contained'}>
       {workout.userId && (
         <SimpleUserPreview userId={workout.userId} date={workout.day} />
       )}
-
       <Card.Content>
         <WorkoutExcercise
           excercise={workout.excercises[0]}
@@ -84,7 +49,7 @@ const SimpleWorkoutPreview = ({ workout }) => {
         <Chip icon="information" elevated>
           Total volume: {workout.load} KG
         </Chip>
-        <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
+        <View style={styles.chipViewStyle}>
           {workout.tags.map((tag, i) => {
             return (
               <Chip
@@ -94,7 +59,7 @@ const SimpleWorkoutPreview = ({ workout }) => {
                   backgroundColor: getBodypartColor(tag.name),
                   marginRight: 5,
                 }}
-                textStyle={{ color: 'white' }}
+                textStyle={styles.chipTextStyle}
                 key={workout.day + i}
               >
                 {tag.name}
@@ -103,15 +68,8 @@ const SimpleWorkoutPreview = ({ workout }) => {
           })}
         </View>
         <Button
-          onPress={() => {
-            navigate('Workout', {
-              dayToCopy: workout.day,
-              userId: workout.userId,
-            })
-          }}
+          onPress={navigateToWorkout}
           labelStyle={styles.saveButtonLabel}
-          // weight={20}
-          // fullWidth={false}
           mode="contained"
         >
           Preview

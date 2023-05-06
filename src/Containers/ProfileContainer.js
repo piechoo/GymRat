@@ -1,66 +1,14 @@
-// import React, { useState } from 'react'
-// import { Button, Image, Text, TouchableOpacity, View } from 'react-native'
-// import auth from '@react-native-firebase/auth'
-// import { useTheme } from '@/Hooks'
-
-// export function ProfileContainer() {
-//   const [authenticated, setAuthenticated] = useState(false)
-
-//   const { Common, Fonts, Gutters, Layout } = useTheme()
-
-//   auth().onAuthStateChanged(user => {
-//     if (user) {
-//       setAuthenticated(true)
-//     } else {
-//       setAuthenticated(false)
-//     }
-//   })
-
-//   const user = auth().currentUser
-//   return (
-//     <View style={[[Layout.colCenter, Gutters.smallHPadding]]}>
-//       <Text style={Fonts.titleRegular}>You're Logged In</Text>
-//       <Image
-//         source={{ uri: user?.photoURL }}
-//         style={{
-//           height: 80,
-//           width: 80,
-//         }}
-//       />
-//       <Text style={Fonts.textRegular}>{user?.displayName}</Text>
-//       <Text style={Fonts.textRegular}>{user?.email}</Text>
-//       <View style={{ marginTop: 30 }}>
-//         <TouchableOpacity
-//           style={[Common.button.outlineRounded, Gutters.regularBMargin]}
-//           onPress={() => auth().signOut()}
-//         >
-//           <Text style={Fonts.textRegular}>Signout</Text>
-//         </TouchableOpacity>
-//         {/* <TouchableOpacity
-//             style={[Common.button.outlineRounded, Gutters.regularBMargin]}
-//             onPress={() => getFriends(user.uid, authToken)}
-//           >
-//             <Text style={Fonts.textRegular}>Get Friends</Text>
-//           </TouchableOpacity> */}
-//       </View>
-//     </View>
-//   )
-// }
-
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext, useCallback } from 'react'
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
   SafeAreaView,
 } from 'react-native'
-// import FormButton from '../components/FormButton'
 
 import firestore from '@react-native-firebase/firestore'
-// import PostCard from '../components/PostCard'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import { useTranslation } from 'react-i18next'
 import Button from '../Components/Button'
@@ -72,17 +20,13 @@ import UsersList from '../Components/UsersList'
 export const ProfileContainer = ({ navigation, route }) => {
   const { user, logout, setUser } = useContext(AuthContext)
   const { t } = useTranslation()
-
-  const [posts, setPosts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [deleted, setDeleted] = useState(false)
   const [modalTitle, setModalTitle] = useState('')
   const [userData, setUserData] = useState(null)
   const [selectedUserIds, setSelectedUserIds] = useState(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [userWorkoutCount, setUserWorkoutCount] = useState(null)
 
-  const getUser = () => {
+  const getUser = useCallback(() => {
     return firestore()
       .collection('users')
       .doc(route.params?.userId ? route.params.userId : user.uid)
@@ -91,8 +35,9 @@ export const ProfileContainer = ({ navigation, route }) => {
           setUserData(documentSnapshot.data())
         }
       })
-  }
-  const getWorkoutCount = () => {
+  }, [route.params?.userId, user.uid])
+
+  const getWorkoutCount = useCallback(() => {
     return firestore()
       .collection('workouts')
       .where(
@@ -106,7 +51,7 @@ export const ProfileContainer = ({ navigation, route }) => {
         const userWrks = documentSnapshot.data().count
         setUserWorkoutCount(userWrks)
       })
-  }
+  }, [route.params?.userId, user.uid])
 
   useFocusEffect(
     React.useCallback(() => {
@@ -128,7 +73,7 @@ export const ProfileContainer = ({ navigation, route }) => {
     }, []),
   )
 
-  const handleFollow = async () => {
+  const handleFollow = useCallback(async () => {
     if (route.params?.userId) {
       if (!user?.followed?.includes?.(route.params?.userId)) {
         firestore()
@@ -166,7 +111,7 @@ export const ProfileContainer = ({ navigation, route }) => {
         })
       }
     }
-  }
+  }, [route.params?.userId, user])
 
   const headerComponent = (
     <View style={styles.container}>
@@ -222,7 +167,6 @@ export const ProfileContainer = ({ navigation, route }) => {
               fullWidth={false}
               onPress={() => {
                 logout()
-                // navigation.navigate('Login')
               }}
             >
               {t(`Logout`)}
@@ -269,7 +213,7 @@ export const ProfileContainer = ({ navigation, route }) => {
   )
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
       <FeedContainer
         headerComponent={headerComponent}
         navigation={navigation}
@@ -293,9 +237,8 @@ export const ProfileContainer = ({ navigation, route }) => {
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1 },
   container: {
-    // flex: 1,
-    // backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

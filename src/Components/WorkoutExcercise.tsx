@@ -17,19 +17,19 @@ import { useState } from 'react'
 import Modal from './Modal'
 import { useMemo } from 'react'
 import NumberValue from './NumberValue'
-import { useDispatch } from 'react-redux'
-import { editUserExcerciseSerie } from '@/Store/User'
 import ExcerciseDetails from './ExcerciseDetails'
 import { useTranslation } from 'react-i18next'
 import { WorkoutExcercise as WorkoutExcerciseType, Set } from '@/Store/types'
 import Button from './Button'
 
-// interface Props {
-//   excercise: WorkoutExcerciseType
-//   date: string
-//   removeExercise: (ex: WorkoutExcerciseType) => any
-//   addSerie: (ex: WorkoutExcerciseType, serie: Set) => any
-// }
+interface Props {
+  excercise: WorkoutExcerciseType
+  removeExercise: (ex: WorkoutExcerciseType) => any
+  editSerie: (ex: WorkoutExcerciseType, set: Set, selectedSet: Set) => any
+  removeSerie: (ex: WorkoutExcerciseType, selectedSet: Set) => any
+  addSerie: (ex: WorkoutExcerciseType, serie: Set) => any
+  readOnly: boolean
+}
 
 const styles = StyleSheet.create({
   saveButton: { paddingHorizontal: 10, paddingVertical: 5 },
@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
 
 const WorkoutExcercise = ({
   excercise,
-  date = '123',
   removeExercise,
   editSerie,
   removeSerie,
@@ -58,7 +57,6 @@ const WorkoutExcercise = ({
   const [selectedSerie, setSelectedSerie] = useState(null)
   const [weight, setWeight] = useState('0')
   const [reps, setReps] = useState('0')
-  const dispatch = useDispatch()
   const { t } = useTranslation()
 
   const editSerieLocal = useCallback(() => {
@@ -98,7 +96,7 @@ const WorkoutExcercise = ({
   }, [addSerie, selectedSerie, editSerieLocal, addSerieLocal, readOnly])
 
   const openEditSerieModal = useCallback(
-    (serieWeight, serieReps, serieIndex) => {
+    (serieWeight: string, serieReps: string, serieIndex: number) => {
       setSelectedSerie(serieIndex)
       setWeight(serieWeight)
       setReps(serieReps)
@@ -108,24 +106,38 @@ const WorkoutExcercise = ({
     [],
   )
 
-  const changeWeight = useCallback(text => {
+  const changeWeight = useCallback((text: string) => {
     setWeight(text)
     setIsModalErrorVisible(false)
   }, [])
-  const changeReps = useCallback(text => {
+  const changeReps = useCallback((text: string) => {
     setReps(text)
     setIsModalErrorVisible(false)
+  }, [])
+
+  const openInfoModal = useCallback(() => {
+    setIsInfoVisible(true)
+  }, [])
+  const closeInfoModal = useCallback(() => {
+    setIsInfoVisible(false)
+  }, [])
+  const removeSelectedExcercise = useCallback(() => {
+    removeExercise(excercise)
+  }, [removeExercise, excercise])
+
+  const openAddSerieModal = useCallback(() => {
+    setSelectedSerie(null)
+    setIsModalErrorVisible(false)
+    setIsModalVisible(true)
+  }, [])
+  const closeAddSerieModal = useCallback(() => {
+    setIsModalVisible(false)
   }, [])
 
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <Text
-          variant="titleLarge"
-          onPress={() => {
-            setIsInfoVisible(true)
-          }}
-        >
+        <Text variant="titleLarge" onPress={openInfoModal}>
           {excercise.name}
         </Text>
         <Text variant="bodyMedium">{excercise.type}</Text>
@@ -133,11 +145,11 @@ const WorkoutExcercise = ({
           <IconButton
             style={styles.delete}
             icon="delete"
-            onPress={() => removeExercise(excercise)}
+            onPress={removeSelectedExcercise}
           />
         )}
         <View style={styles.content}>
-          {excercise?.sets?.map((serie, i) => {
+          {excercise?.sets?.map((serie: Set, i: number) => {
             return readOnly ? (
               <Surface
                 style={styles.surface}
@@ -176,15 +188,7 @@ const WorkoutExcercise = ({
           })}
         </View>
         {!readOnly && (
-          <Button
-            icon="plus"
-            mode="elevated"
-            onPress={() => {
-              setSelectedSerie(null)
-              setIsModalErrorVisible(false)
-              setIsModalVisible(true)
-            }}
-          >
+          <Button icon="plus" mode="elevated" onPress={openAddSerieModal}>
             {t(`workoutExcercise.addSerie`)}
           </Button>
         )}
@@ -197,11 +201,7 @@ const WorkoutExcercise = ({
             >
               <>
                 <Appbar.Header>
-                  <Appbar.BackAction
-                    onPress={() => {
-                      setIsModalVisible(false)
-                    }}
-                  />
+                  <Appbar.BackAction onPress={closeAddSerieModal} />
                   <Appbar.Content
                     title={`${t(`workoutExcercise.setEmpty`)} ${
                       selectedSerie !== null
@@ -240,15 +240,11 @@ const WorkoutExcercise = ({
             <Modal
               isVisible={isInfoVisible}
               setVisible={setIsInfoVisible}
-              // buttons={saveSerie}
+              closeLabel="Close"
             >
               <>
                 <Appbar.Header>
-                  <Appbar.BackAction
-                    onPress={() => {
-                      setIsInfoVisible(false)
-                    }}
-                  />
+                  <Appbar.BackAction onPress={closeInfoModal} />
                   <Appbar.Content title={excercise.name} />
                 </Appbar.Header>
                 <ExcerciseDetails excerciseId={excercise.id} />

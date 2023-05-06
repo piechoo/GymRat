@@ -23,22 +23,16 @@ const SocialButton = ({
   backgroundColor,
   ...rest
 }: Props) => {
-  let bgColor = backgroundColor
   return (
     <TouchableOpacity
-      style={[styles.buttonContainer, { backgroundColor: bgColor }]}
+      style={[styles.buttonContainer, { backgroundColor }]}
       {...rest}
     >
       <View style={styles.iconWrapper}>
-        <IconButton
-          icon={iconName}
-          //   style={styles.icon}
-          iconColor={color}
-          size={22}
-        />
+        <IconButton icon={iconName} iconColor={color} size={22} />
       </View>
       <View style={styles.btnTxtWrapper}>
-        <Text style={[styles.buttonText, { color: color }]}>{buttonTitle}</Text>
+        <Text style={[styles.buttonText, { color }]}>{buttonTitle}</Text>
       </View>
     </TouchableOpacity>
   )

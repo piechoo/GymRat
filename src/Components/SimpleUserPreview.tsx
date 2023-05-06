@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { memo, useState, useEffect } from 'react'
+import React, { memo, useState, useEffect, useCallback } from 'react'
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native'
 import { Text } from 'react-native-paper'
 import { navigate } from '../Navigators/utils'
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
 const SimpleUserPreview = memo(({ userId, date }: Props) => {
   const [userData, setUserData] = useState({})
 
-  const getUser = async () => {
+  const getUser = useCallback(async () => {
     await firestore()
       .collection('users')
       .doc(userId)
@@ -44,7 +43,7 @@ const SimpleUserPreview = memo(({ userId, date }: Props) => {
           setUserData(documentSnapshot.data())
         }
       })
-  }
+  }, [userId])
 
   useEffect(() => {
     if (userId) {

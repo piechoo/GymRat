@@ -1,12 +1,6 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useCallback, useMemo } from 'react'
 import { View, ScrollView, StyleSheet } from 'react-native'
 import { useTheme } from '@/Hooks'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  addUserWorkout,
-  editUserWorkout,
-  getUserDayWorkout,
-} from '@/Store/User'
 import {
   ActivityIndicator,
   Appbar,
@@ -17,13 +11,8 @@ import {
 import { useState } from 'react'
 import Modal from '@/Components/Modal'
 import ExcercisesList from './ExcercisesList'
-import { useCallback } from 'react'
-import { defaultExcerciseValues } from '@/Store/Excercises/consts'
-import { useMemo } from 'react'
-import { AppState } from '@/Store/types'
 import { useTranslation } from 'react-i18next'
 import firestore from '@react-native-firebase/firestore'
-
 import WorkoutExcercise from '../Components/WorkoutExcercise'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import {
@@ -43,6 +32,8 @@ const styles = StyleSheet.create({
   fabGroup: { paddingBottom: 50 },
   saveButtonWrapper: { paddingBottom: 20, width: '80%', alignSelf: 'center' },
   saveButtonLabel: { fontWeight: '600', fontSize: 20 },
+  activityIndicator: { marginTop: 30 },
+  createWorkout: { paddingVertical: 30, textAlign: 'center' },
 })
 
 const WorkoutContainer = React.memo(({ route, navigation }) => {
@@ -51,7 +42,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const { user, setUser } = useContext(AuthContext)
   const currentDay = route?.params?.currentDay
   const dayToCopy = route?.params?.dayToCopy
-  // const userId = route?.params?.userId
 
   const userId = route?.params?.userId ? route?.params?.userId : user.uid
 
@@ -79,7 +69,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      // setLoading(true)
       today = new Date().toISOString().slice(0, 10)
       if (dayToCopy) {
         fetchWorkoutToCopy(dayToCopy)
@@ -95,10 +84,9 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     }, [dayToCopy]),
   )
 
-  const fetchCalendarWorkouts = async () => {
+  const fetchCalendarWorkouts = useCallback(async () => {
     try {
       const list = {}
-      // setLoading(true)
 
       await firestore()
         .collection('workouts')
@@ -118,40 +106,39 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           })
         })
       setCalendarWorkouts(list)
-
-      if (loading) {
-        // setLoading(false)
-      }
     } catch (e) {
       console.log(e)
     }
-  }
+  }, [user?.uid])
 
-  const fetchWorkoutToCopy = async (day, isToday) => {
-    try {
-      setLoading(true)
+  const fetchWorkoutToCopy = useCallback(
+    async (day, isToday) => {
+      try {
+        setLoading(true)
 
-      await firestore()
-        .collection('workouts')
-        .where('userId', '==', userId)
-        .where('day', '==', day)
-        .get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            const { excercises } = doc.data()
-            setEditedWorkoutId(doc.id)
-            setExcercises(excercises)
-            setIsTodayWorkoutDone(isToday)
+        await firestore()
+          .collection('workouts')
+          .where('userId', '==', userId)
+          .where('day', '==', day)
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              const { excercises } = doc.data()
+              setEditedWorkoutId(doc.id)
+              setExcercises(excercises)
+              setIsTodayWorkoutDone(isToday)
+            })
           })
-        })
 
-      setLoading(false)
-    } catch (e) {
-      console.log(e)
-    }
-  }
+        setLoading(false)
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    [userId],
+  )
 
-  const deleteWorkout = async () => {
+  const deleteWorkout = useCallback(async () => {
     try {
       setLoading(true)
 
@@ -167,9 +154,9 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     } catch (e) {
       console.log(e)
     }
-  }
+  }, [editedWorkoutId])
 
-  const submitWorkout = async () => {
+  const submitWorkout = useCallback(async () => {
     const tags = getWorkoutTags(excercises)
     const load = getTotalLoad(excercises)
     const newBestLifts = findNewBestLifts(excercises, user.bestLifts ?? [])
@@ -220,7 +207,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
             error,
           )
         })
-  }
+  }, [excercises, user.bestLifts, user.uid, editedWorkoutId])
 
   const addExcerciseSerie = useCallback((excercise, serie) => {
     setExcercises(state => {
@@ -282,6 +269,42 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     ) : null
   }, [selectedDate])
 
+  const fabActions = useMemo(() => {
+    return [
+      {
+        icon: 'dumbbell',
+        label: t(`workoutExcercise.addFromList`),
+        onPress: () => setIsModalVisible(true),
+      },
+      {
+        icon: 'calendar-blank-multiple',
+        label: t(`workoutExcercise.addFromDay`),
+        onPress: () => setIsFromDayVisible(true),
+      },
+      ...(isWorkoutSaved
+        ? [
+            {
+              icon: 'delete-outline',
+              label: t(`workoutExcercise.delete`),
+              onPress: () => deleteWorkout(),
+            },
+          ]
+        : []),
+    ]
+  }, [isWorkoutSaved])
+
+  const modalBack = useCallback(() => {
+    if (selectedDate) setSelectedDate(null)
+    else setIsFromDayVisible(false)
+  }, [selectedDate])
+
+  const onCalendarSelect = useCallback(
+    day => {
+      if (calendarWorkouts[day?.dateString]) onSelectDate(day)
+    },
+    [calendarWorkouts],
+  )
+
   return (
     <View style={styles.container}>
       <SimpleUserPreview
@@ -292,7 +315,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         <ActivityIndicator
           animating={true}
           size={'large'}
-          style={{ marginTop: 30 }}
+          style={styles.activityIndicator}
         />
       )}
 
@@ -312,10 +335,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           <View style={styles.saveButtonWrapper}>
             {!loading &&
               (excercises.length === 0 ? (
-                <Text
-                  variant="titleLarge"
-                  style={{ paddingVertical: 30, textAlign: 'center' }}
-                >
+                <Text variant="titleLarge" style={styles.createWorkout}>
                   Create new Workout!
                 </Text>
               ) : (
@@ -337,52 +357,24 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           visible={displayFab && !readOnly}
           icon={isFabOpen ? 'close' : 'plus'}
           style={styles.fabGroup}
-          actions={[
-            {
-              icon: 'dumbbell',
-              label: t(`workoutExcercise.addFromList`),
-              onPress: () => setIsModalVisible(true),
-            },
-            {
-              icon: 'calendar-blank-multiple',
-              label: t(`workoutExcercise.addFromDay`),
-              onPress: () => setIsFromDayVisible(true),
-            },
-            ...(isWorkoutSaved
-              ? [
-                  {
-                    icon: 'delete-outline',
-                    label: t(`workoutExcercise.delete`),
-                    onPress: () => deleteWorkout(),
-                  },
-                ]
-              : []),
-          ]}
+          actions={fabActions}
           onStateChange={onStateChange}
         />
         <Modal
           isVisible={isFromDayVisible}
           setVisible={setIsFromDayVisible}
           buttons={selectDayButton}
-          // shouldStretch
           closeLabel="Close"
         >
           <>
             <Appbar.Header>
-              <Appbar.BackAction
-                onPress={() => {
-                  if (selectedDate) setSelectedDate(null)
-                  else setIsFromDayVisible(false)
-                }}
-              />
+              <Appbar.BackAction onPress={modalBack} />
               <Appbar.Content title={'Workout to copy'} />
             </Appbar.Header>
             {!selectedDate && (
               <Calendar
                 markedDates={calendarWorkouts}
-                onDayPress={day => {
-                  if (calendarWorkouts[day?.dateString]) onSelectDate(day)
-                }}
+                onDayPress={onCalendarSelect}
                 firstDay={1}
                 disableAllTouchEventsForDisabledDays={true}
                 enableSwipeMonths={true}
@@ -397,7 +389,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         <Modal
           isVisible={isModalVisible}
           setVisible={setIsModalVisible}
-          // buttons={addExcercisesButton}
           closeLabel="Close"
           shouldStretch
         >

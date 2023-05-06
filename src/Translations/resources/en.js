@@ -21,13 +21,14 @@ export default {
   },
   workoutExcercise: {
     addSerie: 'Add new serie',
-    addFromList: 'Add from list',
-    addFromDay: 'Add from day',
+    addFromList: 'Add excercises from list',
+    addFromDay: 'Copy workout from day',
     cantBeEmpty: 'Weight and reps cannot be equal 0!',
     setNumber: 'Set number',
     weight: 'Weight',
     reps: 'Reps',
     setEmpty: 'Set number',
+    delete: 'Delete workout',
   },
   shared: {
     save: 'Save',

@@ -1,8 +1,6 @@
 import React from 'react'
-import { View, Image } from 'react-native'
-import { useTheme } from '@/Hooks'
+import { View } from 'react-native'
 import { SvgXml } from 'react-native-svg'
-import RatLogo from './LogoImage.svg'
 
 const icon = `
   <svg
@@ -83,18 +81,10 @@ interface Props {
   mode?: imageModes
 }
 
-const Logo = ({
-  height = 200,
-  width = 200,
-  mode = imageModes.contain,
-}: Props) => {
-  const { Layout, Images } = useTheme()
-
+const Logo = ({ height = 200, width = 200 }: Props) => {
   return (
     <View style={{ height, width }}>
       <SvgXml xml={icon} width="100%" height="100%" />
-      {/* <RatLogo style={Layout.fullSize} /> */}
-      {/* <Image style={Layout.fullSize} source={Images.logo} resizeMode={mode} /> */}
     </View>
   )
 }

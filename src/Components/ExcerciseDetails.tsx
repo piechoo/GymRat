@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { useMemo } from 'react'
 import { memo } from 'react'
 import {
@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import { LineChart } from 'react-native-chart-kit'
 import firestore from '@react-native-firebase/firestore'
-import { useTheme, Text } from 'react-native-paper'
+import { useTheme, Text, ActivityIndicator } from 'react-native-paper'
 import { AuthContext } from './Authentication/AuthProvider'
 import { navigate } from '../Navigators/utils'
 
@@ -22,7 +22,6 @@ interface Props {
 const styles = StyleSheet.create({
   container: {
     marginLeft: 10,
-    marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -38,6 +37,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   labelsContainer: { paddingLeft: 10 },
+  labelsContainerCentered: { textAlign: 'center', paddingTop: 10 },
 })
 
 const ExcerciseDetails = memo(({ excerciseId }: Props) => {
@@ -48,13 +48,14 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
     reps: [],
   })
   const [followedBest, setFollowedBest] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getHistoricalExcercises()
     getFollowedBestLifts()
   }, [])
 
-  const getHistoricalExcercises = async () => {
+  const getHistoricalExcercises = useCallback(async () => {
     await firestore()
       .collection('workouts')
       .where('userId', '==', user?.uid)
@@ -75,9 +76,6 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
 
           if (!excerciseFromWorkout) return
 
-          // const maxExcerciseWorkoutValue = Math.max(
-          //   excerciseFromWorkout.sets.map(o => o.weight),
-          // )
           const maxExcerciseWorkoutValue = excerciseFromWorkout.sets.reduce(
             (element, max) => (element.weight > max.weight ? element : max),
             { weight: 0 },
@@ -88,11 +86,15 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
           list.reps.push(maxExcerciseWorkoutValue.reps)
         })
 
+        setLoading(false)
         setHistoricalExcercises(list)
       })
-  }
-  const getFollowedBestLifts = async () => {
-    const bestLiftsCollection = []
+  }, [user?.uid, excerciseId])
+
+  const getFollowedBestLifts = useCallback(async () => {
+    const bestLiftsCollection:
+      | ((prevState: never[]) => never[])
+      | { name: string; value: any; userId: string; userImg: any }[] = []
     await firestore()
       .collection('users')
       .where('__name__', 'in', user?.followed)
@@ -112,26 +114,11 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
         })
       })
     setFollowedBest(bestLiftsCollection)
-  }
-
-  // const historicalExcrecises = useSelector(state =>
-  //   getUserExcerciseHistory(state, excerciseId),
-  // )
+  }, [user?.followed, excerciseId])
 
   const theme = useTheme()
 
   const data = useMemo(() => {
-    const labels = []
-    const values = []
-
-    // const sortedByDate = historicalExcrecises.sort(
-    //   (a, b) => +new Date(a.date) - +new Date(b.date),
-    // )
-    // sortedByDate.map(ex => {
-    //   labels.push(ex.date)
-    //   values.push(Math.max(...ex.excercise.sets.map(o => o.weight)))
-    // })
-
     const oneRepMax =
       historicalExcrecises.values?.length > 0
         ? historicalExcrecises.values[historicalExcrecises.values.length - 1] /
@@ -152,17 +139,23 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
       legend: ['Weight (KG)'], // optional
       oneRepMax: parseFloat(`${oneRepMax}`).toFixed(2),
     }
-  }, [historicalExcrecises])
+  }, [historicalExcrecises, theme])
 
   return (
     <View>
+      {loading && (
+        <ActivityIndicator
+          animating={true}
+          size={'large'}
+          style={{ marginTop: 30 }}
+        />
+      )}
       {data.labels.length > 0 ? (
         <LineChart
           data={data}
           width={Dimensions.get('window').width - 60}
           height={200}
           chartConfig={{
-            //   backgroundColor: '#fb8c00',
             backgroundGradientFrom: theme.colors.background,
             backgroundGradientTo: theme.colors.background,
             decimalPlaces: 2, // optional, defaults to 2dp
@@ -180,25 +173,16 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
           formatXLabel={val => val.slice(5)}
         />
       ) : null}
-      <Text
-        variant="titleSmall"
-        style={[styles.labelsContainer, { textAlign: 'center' }]}
-      >
-        Current estimated one rep max:
-        {data.oneRepMax} KG
-      </Text>
+
       {followedBest.length > 0 && (
         <>
-          <Text
-            variant="titleLarge"
-            style={[styles.labelsContainer, { textAlign: 'center' }]}
-          >
-            Followed heaviest lifts:
+          <Text variant="titleLarge" style={styles.labelsContainerCentered}>
+            Friends heaviest lifts:
           </Text>
           <ScrollView>
             {followedBest.map(el => {
               return (
-                <View style={styles.container}>
+                <View style={styles.container} key={el.userId}>
                   <TouchableOpacity
                     onPress={() =>
                       navigate('Profile', {
@@ -227,6 +211,12 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
             })}
           </ScrollView>
         </>
+      )}
+      {!loading && (
+        <Text variant="titleSmall" style={styles.labelsContainerCentered}>
+          Your current estimated one rep max:
+          {data.oneRepMax} KG
+        </Text>
       )}
     </View>
   )

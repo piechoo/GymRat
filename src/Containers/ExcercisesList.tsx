@@ -3,6 +3,7 @@ import { View, StyleSheet, FlatList } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { bodyParts, excercises } from '@/Store/Excercises/consts'
 import { Appbar, List } from 'react-native-paper'
+import { WorkoutExcercise } from '../Store/types'
 
 const styles = StyleSheet.create({
   container: {
@@ -15,11 +16,17 @@ const styles = StyleSheet.create({
   },
 })
 
+interface Props {
+  setSelectedExcercises: (stateFunction: (state: any) => void) => void
+  selectedExcercises: WorkoutExcercise[]
+  setIsModalVisible: (isVisible: boolean) => void
+}
+
 const ExcercisesList = ({
   setSelectedExcercises,
   selectedExcercises,
   setIsModalVisible,
-}) => {
+}: Props) => {
   const [selectedBodypart, setSelectedBodypart] = useState(null)
   const { t } = useTranslation()
 
@@ -72,7 +79,7 @@ const ExcercisesList = ({
               onPress={() => {
                 setSelectedExcercises(state => {
                   if (state.indexOf(item) === -1) return [...state, item]
-                  return state.filter(n => n.id !== item.id)
+                  return state.filter((n: WorkoutExcercise) => n.id !== item.id)
                 })
               }}
               style={{

@@ -1,15 +1,7 @@
 import React, { useContext, useState } from 'react'
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  ScrollView,
-} from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { HelperText, TextInput } from 'react-native-paper'
 import { useTranslation } from 'react-i18next'
-import SocialButton from '../Components/SocialButton'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import Logo from '../Components/Logo'
 import Button from '../Components/Button'
@@ -25,19 +17,7 @@ const LoginScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Logo />
-
       <Text style={styles.text}>Gym Rat</Text>
-
-      {/* <TextInput
-        label="Email input"
-        placeholder="Email"
-        value={email}
-        onChangeText={userEmail => setEmail(userEmail)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-        right={<TextInput.Icon icon="account" />}
-      /> */}
       <TextInput
         style={{ width: '100%' }}
         label="Email"
@@ -115,7 +95,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Kufam-SemiBoldItalic',
     fontSize: 28,
     marginBottom: 10,
-    // color: '#051d5f',
   },
   navButton: {
     marginTop: 15,

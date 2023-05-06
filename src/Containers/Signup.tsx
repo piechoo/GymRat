@@ -1,11 +1,12 @@
 import React, { useContext, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import { HelperText, TextInput } from 'react-native-paper'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import Button from '../Components/Button'
+import { navigate } from '../Navigators/utils'
 
-const SignupScreen = ({ navigation }) => {
+const SignupScreen = React.memo(() => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fname, setFname] = useState('')
@@ -56,7 +57,6 @@ const SignupScreen = ({ navigation }) => {
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
-          // right={<TextInput.Icon icon="account" />}
         />
         <View style={styles.divider} />
 
@@ -99,10 +99,6 @@ const SignupScreen = ({ navigation }) => {
             !lname ||
             !fname
           ) {
-            console.log(password)
-            console.log(confirmPassword)
-            console.log(password != confirmPassword)
-
             setIsErrorVisible(true)
           } else register?.(email, password, fname, lname)
         }}
@@ -120,33 +116,17 @@ const SignupScreen = ({ navigation }) => {
         {'Sign In with Google'}
       </Button>
 
-      <Button onPress={() => navigation.navigate('Login')}>
+      <Button onPress={() => navigate('Login')}>
         {'Have an account? Sign In'}
       </Button>
-
-      {/* <View style={styles.textPrivate}>
-        <Text style={styles.color_textPrivate}>
-          By registering, you confirm that you accept our{' '}
-        </Text>
-        <TouchableOpacity onPress={() => alert('Terms Clicked!')}>
-          <Text style={[styles.color_textPrivate, { color: '#de4d41' }]}>
-            Terms of service
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.color_textPrivate}> and </Text>
-        <Text style={[styles.color_textPrivate, { color: '#de4d41' }]}>
-          Privacy Policy
-        </Text>
-      </View> */}
     </View>
   )
-}
+})
 
 export default SignupScreen
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: '#f9fafd',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -156,7 +136,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Kufam-SemiBoldItalic',
     fontSize: 28,
     marginBottom: 10,
-    // color: '#051d5f',
   },
   navButton: {
     marginTop: 15,

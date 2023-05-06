@@ -76,11 +76,3 @@ const OnboardingScreen = ({ navigation }) => {
 }
 
 export default OnboardingScreen
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})
