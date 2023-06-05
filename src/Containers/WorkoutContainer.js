@@ -6,6 +6,7 @@ import {
   Appbar,
   FAB,
   Portal,
+  Snackbar,
   Text,
 } from 'react-native-paper'
 import { useState } from 'react'
@@ -19,6 +20,7 @@ import {
   findNewBestLifts,
   getTotalLoad,
   getWorkoutTags,
+  validateWorkout,
 } from '../Store/Excercises/consts'
 import { Calendar } from 'react-native-calendars'
 import SimpleWorkoutPreview from '../Components/SimpleWorkoutPreview'
@@ -48,6 +50,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const readOnly = userId !== user.uid
 
   const [isFabOpen, setIsFabOpen] = useState(false)
+  const [showSnackbar, setShowSnackbar] = useState(false)
   const [displayFab, setDisplayFab] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [isFromDayVisible, setIsFromDayVisible] = useState(false)
@@ -157,53 +160,56 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   }, [editedWorkoutId])
 
   const submitWorkout = useCallback(async () => {
-    const tags = getWorkoutTags(excercises)
-    const load = getTotalLoad(excercises)
-    const newBestLifts = findNewBestLifts(excercises, user.bestLifts ?? [])
-    setExcercises([])
-    setLoading(true)
+    const isValid = validateWorkout(excercises)
+    if (isValid) {
+      const tags = getWorkoutTags(excercises)
+      const load = getTotalLoad(excercises)
+      const newBestLifts = findNewBestLifts(excercises, user.bestLifts ?? [])
+      setExcercises([])
+      setLoading(true)
 
-    await firestore()
-      .collection('users')
-      .doc(user.uid)
-      .update({
-        bestLifts: newBestLifts,
-      })
-      .then(() => {
-        setUser?.({ ...user, bestLifts: newBestLifts })
-      })
-
-    if (isWorkoutSaved)
-      firestore()
-        .collection('workouts')
-        .doc(editedWorkoutId)
+      await firestore()
+        .collection('users')
+        .doc(user.uid)
         .update({
-          excercises: excercises,
-          tags: tags,
-          load: load,
+          bestLifts: newBestLifts,
         })
         .then(() => {
-          navigation.navigate('Feed')
+          setUser?.({ ...user, bestLifts: newBestLifts })
         })
-    else
-      firestore()
-        .collection('workouts')
-        .add({
-          userId: user.uid,
-          day: currentDay ?? new Date().toISOString().slice(0, 10),
-          excercises: excercises,
-          postTime: firestore.Timestamp.fromDate(new Date()),
-          tags: tags,
-          load: load,
-          likes: null,
-          comments: null,
-        })
-        .then(() => {
-          navigation.navigate('Feed')
-        })
-        .catch(error => {
-          console.log(error)
-        })
+
+      if (isWorkoutSaved)
+        firestore()
+          .collection('workouts')
+          .doc(editedWorkoutId)
+          .update({
+            excercises: excercises,
+            tags: tags,
+            load: load,
+          })
+          .then(() => {
+            navigation.navigate('Feed')
+          })
+      else
+        firestore()
+          .collection('workouts')
+          .add({
+            userId: user.uid,
+            day: currentDay ?? new Date().toISOString().slice(0, 10),
+            excercises: excercises,
+            postTime: firestore.Timestamp.fromDate(new Date()),
+            tags: tags,
+            load: load,
+          })
+          .then(() => {
+            navigation.navigate('Feed')
+          })
+          .catch(error => {
+            console.log(error)
+          })
+    } else {
+      setShowSnackbar(true)
+    }
   }, [excercises, user.bestLifts, user.uid, editedWorkoutId])
 
   const addExcerciseSerie = useCallback((excercise, serie) => {
@@ -347,6 +353,7 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           </View>
         )}
       </ScrollView>
+
       <Portal>
         <FAB.Group
           open={isFabOpen}
@@ -378,7 +385,10 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
               />
             )}
             {selectedDate && (
-              <SimpleWorkoutPreview workout={calendarWorkouts[selectedDate]} />
+              <SimpleWorkoutPreview
+                workout={calendarWorkouts[selectedDate]}
+                hidePreview
+              />
             )}
           </>
         </Modal>
@@ -395,6 +405,16 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
             selectedExcercises={excercises}
           />
         </Modal>
+        <Snackbar
+          visible={showSnackbar}
+          onDismiss={() => setShowSnackbar(false)}
+          action={{
+            label: 'OK',
+          }}
+          duration={3000}
+        >
+          You cannot save workout with empty excercises!
+        </Snackbar>
       </Portal>
     </View>
   )

@@ -206,7 +206,9 @@ const WorkoutExcercise = ({
                     title={`${t(`workoutExcercise.setEmpty`)} ${
                       selectedSerie !== null
                         ? selectedSerie + 1
-                        : excercise?.sets?.length + 1
+                        : excercise?.sets?.length
+                        ? excercise?.sets?.length + 1
+                        : 1
                     }`}
                   />
                   {selectedSerie !== null && !readOnly && (

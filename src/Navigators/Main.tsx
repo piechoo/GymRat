@@ -21,7 +21,13 @@ const MainNavigator = () => {
         height: '100%',
       }}
     >
-      <Tab.Navigator>
+      <Tab.Navigator
+        tabBarOptions={{
+          style: {
+            backgroundColor: 'transparent',
+          },
+        }}
+      >
         <Tab.Screen
           name="Feed"
           component={FeedContainer}

@@ -112,8 +112,16 @@ export const getTotalLoad = excercises => {
       load += element.reps * element.weight
     })
   })
+
   return load
 }
+
+export const validateWorkout = excercises => {
+  excercises.every(ex => {
+    return ex.sets && ex.sets?.length > 0
+  })
+}
+
 export const excercises = {
   [bodyParts.chest]: [
     { name: 'Barbell bench press', type: execiseType.weight, id: 1 },

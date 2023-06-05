@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { bodyParts, excercises } from '@/Store/Excercises/consts'
 import { Appbar, List } from 'react-native-paper'
 import { WorkoutExcercise } from '../Store/types'
+import { useTheme } from '../Hooks'
 
 const styles = StyleSheet.create({
   container: {
@@ -29,6 +30,7 @@ const ExcercisesList = ({
 }: Props) => {
   const [selectedBodypart, setSelectedBodypart] = useState(null)
   const { t } = useTranslation()
+  const { darkMode } = useTheme()
 
   return (
     <View style={styles.container}>
@@ -86,7 +88,9 @@ const ExcercisesList = ({
                 backgroundColor: !!selectedExcercises.find(
                   el => el.id === item.id,
                 )
-                  ? 'rgba(0, 0, 0, .32)'
+                  ? darkMode
+                    ? 'rgba(200, 200, 200, .32)'
+                    : 'rgba(0, 0, 0, .32)'
                   : undefined,
               }}
             />

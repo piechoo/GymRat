@@ -1,5 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
+import { useTheme } from '../Hooks'
 
 interface Props {
   value: number
@@ -12,10 +13,14 @@ const styles = StyleSheet.create({
 })
 
 const NumberValue = ({ value, desc }: Props) => {
+  const { NavigationTheme } = useTheme()
+
   return (
     <View style={styles.element}>
-      <Text style={styles.value}>{value}</Text>
-      <Text>{desc}</Text>
+      <Text style={[styles.value, { color: NavigationTheme.colors.text }]}>
+        {value}
+      </Text>
+      <Text style={{ color: NavigationTheme.colors.text }}>{desc}</Text>
     </View>
   )
 }

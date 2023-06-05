@@ -24,7 +24,7 @@ const ApplicationNavigator = () => {
   const { user, setUser } = useContext(AuthContext)
   const [initializing, setInitializing] = useState(true)
 
-  const onAuthStateChanged = async (user: any) => {
+  const onAuthStateChanged = async user => {
     if (user) {
       await firestore()
         .collection('users')
@@ -35,8 +35,6 @@ const ApplicationNavigator = () => {
             const { followed, followedBy, bestLifts } = documentSnapshot.data()
             setUser?.({ ...user._user, followed, followedBy, bestLifts })
           }
-
-          // setUser?.(userData)
         })
     }
 
@@ -45,7 +43,7 @@ const ApplicationNavigator = () => {
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
-    return subscriber // unsubscribe on unmount
+    return subscriber
   }, [])
 
   if (initializing) return null

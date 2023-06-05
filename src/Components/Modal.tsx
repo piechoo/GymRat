@@ -3,6 +3,7 @@ import { memo } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Portal, Modal as PaperModal } from 'react-native-paper'
 import Button from './Button'
+import { useTheme } from '../Hooks'
 
 interface ModalProps {
   isVisible: boolean
@@ -15,7 +16,6 @@ interface ModalProps {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
     marginVertical: 80,
     marginHorizontal: 30,
     flexDirection: 'column',
@@ -37,6 +37,7 @@ const Modal = memo(
     closeLabel = 'Cancel',
   }: ModalProps) => {
     const hideModal = () => setVisible(false)
+    const { NavigationTheme } = useTheme()
 
     const stretchStyle = useMemo(
       () => ({ flex: shouldStretch ? 1 : 0 }),
@@ -48,7 +49,11 @@ const Modal = memo(
         <PaperModal
           visible={isVisible}
           onDismiss={hideModal}
-          contentContainerStyle={[styles.container, stretchStyle]}
+          contentContainerStyle={[
+            styles.container,
+            stretchStyle,
+            { backgroundColor: NavigationTheme.colors.background },
+          ]}
         >
           {children}
           <View style={styles.modalView}>

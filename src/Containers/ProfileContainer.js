@@ -1,7 +1,6 @@
 import React, { useState, useContext, useCallback } from 'react'
 import {
   View,
-  Text,
   Image,
   TouchableOpacity,
   StyleSheet,
@@ -16,6 +15,7 @@ import FeedContainer from './FeedContainer'
 import { useFocusEffect } from '@react-navigation/native'
 import Modal from '../Components/Modal'
 import UsersList from '../Components/UsersList'
+import { Text } from 'react-native-paper'
 
 export const ProfileContainer = ({ navigation, route }) => {
   const { user, logout, setUser } = useContext(AuthContext)

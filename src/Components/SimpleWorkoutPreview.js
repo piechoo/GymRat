@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   chipViewStyle: { flexDirection: 'row', paddingVertical: 10 },
 })
 
-const SimpleWorkoutPreview = ({ workout }) => {
+const SimpleWorkoutPreview = ({ workout, hidePreview }) => {
   const navigateToWorkout = useCallback(() => {
     navigate('Workout', {
       dayToCopy: workout.day,
@@ -67,13 +67,15 @@ const SimpleWorkoutPreview = ({ workout }) => {
             )
           })}
         </View>
-        <Button
-          onPress={navigateToWorkout}
-          labelStyle={styles.saveButtonLabel}
-          mode="contained"
-        >
-          Preview
-        </Button>
+        {!hidePreview && (
+          <Button
+            onPress={navigateToWorkout}
+            labelStyle={styles.saveButtonLabel}
+            mode="contained"
+          >
+            Preview
+          </Button>
+        )}
       </Card.Content>
     </Card>
   )

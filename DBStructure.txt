@@ -1,0 +1,7 @@
+user:{
+	name
+	guid
+	
+	
+	
+	keyhash: qlpXaJCWxab9zUgKrYoAaMPlkPg=

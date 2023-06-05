@@ -116,8 +116,10 @@ const FeedContainer = React.memo(({ userId, headerComponent }) => {
   }
 
   useEffect(() => {
+    setDocumentData([])
+    setLastVisible('')
     retrieveData()
-  }, [])
+  }, [userId])
 
   const renderFooter = useCallback(() => {
     return refreshing ? (
