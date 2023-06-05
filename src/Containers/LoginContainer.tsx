@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
-import { HelperText, TextInput } from 'react-native-paper'
+import { View, StyleSheet, ScrollView } from 'react-native'
+import { HelperText, Text, TextInput } from 'react-native-paper'
 import { useTranslation } from 'react-i18next'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import Logo from '../Components/Logo'
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   text: {
-    fontFamily: 'Kufam-SemiBoldItalic',
+    // fontFamily: 'Kufam-SemiBoldItalic',
     fontSize: 28,
     marginBottom: 10,
   },

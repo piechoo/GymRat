@@ -1,6 +1,7 @@
 import React from 'react'
 import { View } from 'react-native'
 import { SvgXml } from 'react-native-svg'
+import { useTheme } from '../Hooks'
 
 const icon = `
   <svg
@@ -83,7 +84,14 @@ interface Props {
 
 const Logo = ({ height = 200, width = 200 }: Props) => {
   return (
-    <View style={{ height, width }}>
+    <View
+      style={{
+        height,
+        width,
+        backgroundColor: 'white',
+        borderRadius: 50,
+      }}
+    >
       <SvgXml xml={icon} width="100%" height="100%" />
     </View>
   )
