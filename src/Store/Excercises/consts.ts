@@ -43,6 +43,11 @@ export const findNewBestLifts = (
     .concat(bestWithoutBetter)
 }
 
+export const findNameFromId = (id: number) => {
+  const bodyPart = getExcerciseBodypart({ id })
+  if (bodyPart) return excercises?.[bodyPart].find(ex => ex.id === id)?.name
+  return undefined
+}
 export const getBodypartColor = bodypart => {
   const colors = [
     '#e44e43',
@@ -117,7 +122,7 @@ export const getTotalLoad = excercises => {
 }
 
 export const validateWorkout = excercises => {
-  excercises.every(ex => {
+  return excercises.every(ex => {
     return ex.sets && ex.sets?.length > 0
   })
 }

@@ -1115,7 +1115,7 @@
     "minimatch" "^3.0.4"
     "strip-json-comments" "^3.1.1"
 
-"@expo/config-plugins@^5.0.1", "@expo/config-plugins@^5.0.4":
+"@expo/config-plugins@^5.0.1":
   "integrity" "sha512-vzUcVpqOMs3h+hyRdhGwk+eGIOhXa5xYdd92yO17RMNHav3v/+ekMbs7XA2c3lepMO8Yd4/5hqmRw9ZTL6jGzg=="
   "resolved" "https://registry.npmjs.org/@expo/config-plugins/-/config-plugins-5.0.4.tgz"
   "version" "5.0.4"
@@ -1683,32 +1683,30 @@
   "resolved" "https://registry.npmjs.org/@react-native-community/eslint-plugin/-/eslint-plugin-1.2.0.tgz"
   "version" "1.2.0"
 
-"@react-native-firebase/app@^17.3.2", "@react-native-firebase/app@17.3.2":
-  "integrity" "sha512-JPA9PuD3il2/FERnsW5bC/PbXdcBcVMtk4V0vL8YgLh+jQg+E3qQTQmeWn9eOWTYJb6BYOiiNHTdTglvqoo5Cg=="
-  "resolved" "https://registry.npmjs.org/@react-native-firebase/app/-/app-17.3.2.tgz"
-  "version" "17.3.2"
+"@react-native-firebase/app@^18.3.0", "@react-native-firebase/app@18.3.0":
+  "integrity" "sha512-4sJf5mM551Y6E8D1hQufAU/PNEecJEaJbF4Me0JyclI2RXUHlTxJUpAsB/gxPY74LY99FaogFsDEB+3BuZ2B9w=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/app/-/app-18.3.0.tgz"
+  "version" "18.3.0"
   dependencies:
-    "@expo/config-plugins" "^5.0.4"
     "opencollective-postinstall" "^2.0.1"
     "superstruct" "^0.6.2"
 
-"@react-native-firebase/auth@^17.3.2":
-  "integrity" "sha512-YvVvKTwpMMWnDThKh4btgAh6XYo7ie1hwwrTOGNd8Vpsr+nGmiPPB0COdiVaQu8KWX1CzPbOuxJdPwWaz9lW/w=="
-  "resolved" "https://registry.npmjs.org/@react-native-firebase/auth/-/auth-17.3.2.tgz"
-  "version" "17.3.2"
+"@react-native-firebase/auth@^18.3.0":
+  "integrity" "sha512-2Z33pG+41RvYX6NxQfRhle+wAfhDKYStSANMVT4NMQKKhgmxryH0CXcfHA0RvfQysdrmBVX2td7l6hXriYL70A=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/auth/-/auth-18.3.0.tgz"
+  "version" "18.3.0"
   dependencies:
-    "@expo/config-plugins" "^5.0.4"
     "plist" "^3.0.5"
 
-"@react-native-firebase/firestore@^17.3.2":
-  "integrity" "sha512-ZqdtYcZExAdfFXIntfy5/hTRK8jAyZnQCbpCyvC3O8f1m4C2pDo57xLzTdukORtJjiBGkxBpcULLBrSbOJ/SXw=="
-  "resolved" "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-17.3.2.tgz"
-  "version" "17.3.2"
+"@react-native-firebase/firestore@^18.3.0":
+  "integrity" "sha512-lf++MjazL+5JH0wvlFb2WFqEtUvULaNy4ahlLYOoNwlCjDyvR3L9mYov6cbBVoSu1AJrQcv9u2aHZApEJKaFZg=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-18.3.0.tgz"
+  "version" "18.3.0"
 
-"@react-native-firebase/storage@^17.3.2":
-  "integrity" "sha512-Pojwd5SuM8lvJBDfVV9ylyTOb8bwildhdAetLgyIdvyVwE9QqzpZoOebb283ceJ0h6OdznHiR66JJStcyclUwg=="
-  "resolved" "https://registry.npmjs.org/@react-native-firebase/storage/-/storage-17.3.2.tgz"
-  "version" "17.3.2"
+"@react-native-firebase/storage@^18.3.0":
+  "integrity" "sha512-4tMxu1364yH+hPSObEs18cMPGg7h0y7QynVfArvuK8lRNkpafeVAgYa8x0xp80LXUjMWXiN4OmmGpyy/CYH2lg=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/storage/-/storage-18.3.0.tgz"
+  "version" "18.3.0"
 
 "@react-native-google-signin/google-signin@^9.0.2":
   "integrity" "sha512-oTD0ZT6ZSH7CZjM1i6hR/gFAXv9As7nxhN99XGliNxf6SChZcQRwGeaz1DjoYrWExWDVX00EH1Per3dMjhAWkQ=="

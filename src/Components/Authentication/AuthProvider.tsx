@@ -80,6 +80,25 @@ export const AuthProvider = ({ children }: Props) => {
                             error,
                           )
                         })
+
+                      firestore()
+                        .collection('gamification')
+                        .doc(auth()?.currentUser?.uid)
+                        .set({
+                          userId: currentGoogleUser?.uid,
+                          dailyBonus: 0,
+                          excerciseDayStreak: 0,
+                          friendBonus: 0,
+                          lastExcerciseDay: firestore.Timestamp.fromDate(
+                            new Date(),
+                          ),
+                          loginBonusDate: firestore.Timestamp.fromDate(
+                            new Date(),
+                          ),
+                          tasksCompleted: 0,
+                          totalLoad: 0,
+                          overall: 0,
+                        })
                     }
                   })
               })
@@ -111,6 +130,24 @@ export const AuthProvider = ({ children }: Props) => {
                     userImg: null,
                   })
                   .then(() => {
+                    firestore()
+                      .collection('gamification')
+                      .doc(auth()?.currentUser?.uid)
+                      .set({
+                        userId: auth()?.currentUser?.uid,
+                        dailyBonus: 0,
+                        excerciseDayStreak: 0,
+                        friendBonus: 0,
+                        lastExcerciseDay: firestore.Timestamp.fromDate(
+                          new Date(),
+                        ),
+                        loginBonusDate: firestore.Timestamp.fromDate(
+                          new Date(),
+                        ),
+                        tasksCompleted: 0,
+                        totalLoad: 0,
+                        overall: 0,
+                      })
                     auth().signInWithEmailAndPassword(email, password)
                   })
                   .catch(error => {

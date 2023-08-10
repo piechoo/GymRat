@@ -6,9 +6,17 @@ import firestore from '@react-native-firebase/firestore'
 import { AuthContext } from '../Components/Authentication/AuthProvider'
 import SimpleWorkoutPreview from '../Components/SimpleWorkoutPreview'
 
+const styles = StyleSheet.create({
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
+})
+
 const limit = 5
 
-const FeedContainer = React.memo(({ userId, headerComponent }) => {
+const LeaderboardContainer = React.memo(({ userId, headerComponent }) => {
   const [isFriendsOnly, setIsFriendsOnly] = useState(true)
   const { user } = useContext(AuthContext)
 
@@ -143,6 +151,6 @@ const FeedContainer = React.memo(({ userId, headerComponent }) => {
   )
 })
 
-FeedContainer.displayName = 'FeedContainer'
+LeaderboardContainer.displayName = 'LeaderboardContainer'
 
-export default FeedContainer
+export default LeaderboardContainer

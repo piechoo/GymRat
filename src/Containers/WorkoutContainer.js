@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Appbar,
   FAB,
+  IconButton,
   Portal,
   Snackbar,
   Text,
@@ -27,6 +28,9 @@ import SimpleWorkoutPreview from '../Components/SimpleWorkoutPreview'
 import Button from '../Components/Button'
 import { useFocusEffect } from '@react-navigation/native'
 import SimpleUserPreview from '../Components/SimpleUserPreview'
+import { getCompletedTasks } from '../Store/Gamification/utils'
+import { useUpdateActiveTasks } from '../Store/Gamification/useUpdateActiveTasks'
+import TaskItem, { defaultTask } from '../Components/TaskItem'
 
 const styles = StyleSheet.create({
   addButton: { paddingHorizontal: 10, paddingVertical: 5 },
@@ -53,6 +57,9 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const [showSnackbar, setShowSnackbar] = useState(false)
   const [displayFab, setDisplayFab] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isStreakModalVisible, setIsStreakModalVisible] = useState(false)
+  const [currentStreak, setCurrentStreak] = useState(0)
+  const [currentCompletedTasks, setCurrentCompletedTasks] = useState([])
   const [isFromDayVisible, setIsFromDayVisible] = useState(false)
   const onStateChange = ({ open }) => setIsFabOpen(open)
   const [calendarWorkouts, setCalendarWorkouts] = useState({})
@@ -61,6 +68,9 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
     setSelectedDate(day?.dateString)
   }, [])
   const [excercises, setExcercises] = useState([])
+  const [gamification, setGamification] = useState({})
+  const [activeTasks, setActiveTasks] = useState([])
+
   const [loading, setLoading] = useState(true)
   const [editedWorkoutId, setEditedWorkoutId] = useState(null)
   const [isTodayWorkoutDone, setIsTodayWorkoutDone] = useState(false)
@@ -77,6 +87,8 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
         fetchWorkoutToCopy(dayToCopy)
       } else fetchWorkoutToCopy(today, true)
       fetchCalendarWorkouts()
+      fetchUserGamification()
+      fetchUserTasks()
 
       setDisplayFab(true)
       return () => {
@@ -86,6 +98,8 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
       }
     }, [dayToCopy]),
   )
+
+  const updateActiveTasks = useUpdateActiveTasks()
 
   const fetchCalendarWorkouts = useCallback(async () => {
     try {
@@ -109,6 +123,49 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           })
         })
       setCalendarWorkouts(list)
+    } catch (e) {
+      console.log(e)
+    }
+  }, [user?.uid])
+
+  const fetchUserGamification = useCallback(async () => {
+    try {
+      await firestore()
+        .collection('gamification')
+        .doc(user?.uid)
+        .get()
+        .then(documentSnapshot => {
+          if (documentSnapshot.exists) {
+            setGamification(documentSnapshot.data())
+          }
+        })
+      setCalendarWorkouts(list)
+    } catch (e) {
+      console.log(e)
+    }
+  }, [user?.uid])
+
+  const fetchUserTasks = useCallback(async () => {
+    const list = []
+
+    try {
+      await firestore()
+        .collection('activeTasks')
+        .where(
+          'creationDate',
+          '>',
+          firestore.Timestamp.fromDate(
+            new Date(new Date().setDate(new Date().getDate() - 1)),
+          ),
+        )
+        .where('userId', '==', user?.uid)
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            list.push({ ...doc.data(), id: doc.id })
+          })
+        })
+      setActiveTasks(list)
     } catch (e) {
       console.log(e)
     }
@@ -162,55 +219,101 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
   const submitWorkout = useCallback(async () => {
     const isValid = validateWorkout(excercises)
     if (isValid) {
+      let completedTasks = []
+
       const tags = getWorkoutTags(excercises)
+
       const load = getTotalLoad(excercises)
+
       const newBestLifts = findNewBestLifts(excercises, user.bestLifts ?? [])
-      setExcercises([])
+      let daysStreak = gamification.excerciseDayStreak
+
+      let currentTasksCompleted = gamification.tasksCompleted
+
       setLoading(true)
 
-      await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .update({
-          bestLifts: newBestLifts,
-        })
-        .then(() => {
-          setUser?.({ ...user, bestLifts: newBestLifts })
-        })
+      const batch = firestore().batch()
 
-      if (isWorkoutSaved)
-        firestore()
+      const userRef = firestore().collection('users').doc(user.uid)
+      batch.update(userRef, {
+        bestLifts: newBestLifts,
+      })
+
+      if (isWorkoutSaved) {
+        const workoutRef = firestore()
           .collection('workouts')
           .doc(editedWorkoutId)
-          .update({
-            excercises: excercises,
-            tags: tags,
-            load: load,
-          })
-          .then(() => {
-            navigation.navigate('Feed')
-          })
-      else
-        firestore()
-          .collection('workouts')
-          .add({
-            userId: user.uid,
-            day: currentDay ?? new Date().toISOString().slice(0, 10),
-            excercises: excercises,
-            postTime: firestore.Timestamp.fromDate(new Date()),
-            tags: tags,
-            load: load,
-          })
-          .then(() => {
-            navigation.navigate('Feed')
-          })
-          .catch(error => {
-            console.log(error)
-          })
+        batch.update(workoutRef, {
+          excercises: excercises,
+          tags: tags,
+          load: load,
+        })
+      } else {
+        completedTasks = await updateActiveTasks(excercises, activeTasks, batch)
+        const workoutRef = firestore().collection('workouts').doc()
+        batch.set(workoutRef, {
+          userId: user.uid,
+          day: currentDay ?? new Date().toISOString().slice(0, 10),
+          excercises: excercises,
+          postTime: firestore.Timestamp.fromDate(new Date()),
+          tags: tags,
+          load: load,
+        })
+
+        const diffInTime =
+          new Date().getTime() -
+          gamification.lastExcerciseDay.toDate().getTime()
+
+        // To calculate the no. of days between two dates
+        const diffInDays = diffInTime / (1000 * 3600 * 24)
+
+        if (diffInDays <= 1) {
+          daysStreak++
+        } else {
+          daysStreak = 1
+        }
+
+        if (completedTasks.length > 0) {
+          currentTasksCompleted += completedTasks.length
+        }
+
+        const gamificationRef = firestore()
+          .collection('gamification')
+          .doc(user.uid)
+
+        batch.update(gamificationRef, {
+          excerciseDayStreak: daysStreak,
+          lastExcerciseDay: firestore.Timestamp.fromDate(new Date()),
+          tasksCompleted: currentTasksCompleted,
+          totalLoad: gamification.totalLoad + load,
+          overall: gamification.overall + load + completedTasks.length * 1000,
+        })
+      }
+
+      const result = await batch.commit()
+
+      if (!isWorkoutSaved) {
+        console.log(completedTasks)
+        console.log(daysStreak)
+        setCurrentStreak(daysStreak)
+        setIsStreakModalVisible(true)
+        setCurrentCompletedTasks(completedTasks)
+        // pokazać modal z liczbą streak i listą wykonanych zadań
+      }
+      setUser?.({ ...user, bestLifts: newBestLifts })
+      // setExcercises([])
+      // navigation.navigate('Feed')
     } else {
       setShowSnackbar(true)
     }
-  }, [excercises, user.bestLifts, user.uid, editedWorkoutId])
+  }, [
+    excercises,
+    user.bestLifts,
+    user.uid,
+    editedWorkoutId,
+    gamification,
+    updateActiveTasks,
+  ])
 
   const addExcerciseSerie = useCallback((excercise, serie) => {
     setExcercises(state => {
@@ -393,6 +496,40 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           </>
         </Modal>
 
+        <Modal
+          isVisible={isStreakModalVisible}
+          setVisible={setIsStreakModalVisible}
+          closeLabel="Close"
+          shouldStretch
+        >
+          <ScrollView
+            style={{ height: '100%' }}
+            contentContainerStyle={{
+              alignItems: 'center',
+            }}
+          >
+            <Text variant="headlineMedium" style={{ paddingTop: 20 }}>
+              Workout Completed!{' '}
+            </Text>
+            <IconButton icon={'fire'} iconColor={'red'} size={182} />
+            <Text>Congratulations! Your current day streak is: </Text>
+            <Text variant="headlineMedium">{currentStreak}</Text>
+
+            {currentCompletedTasks.length > 0 ? (
+              <>
+                <Text>Completed tasks:</Text>
+                {currentCompletedTasks.map(el => {
+                  return <TaskItem task={el} />
+                })}
+
+                <Text variant="titleMedium">
+                  You receive {currentCompletedTasks.length * 1000} points for
+                  completed tasks!
+                </Text>
+              </>
+            ) : null}
+          </ScrollView>
+        </Modal>
         <Modal
           isVisible={isModalVisible}
           setVisible={setIsModalVisible}
