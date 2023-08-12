@@ -7,6 +7,7 @@ import { IconButton } from 'react-native-paper'
 import Modal from '../Components/Modal'
 import UsersList from '../Components/UsersList'
 import { WorkoutContainer } from '../Containers'
+import LeaderboardContainer from '../Containers/LeaderboardContainer'
 
 const Tab = createBottomTabNavigator()
 
@@ -53,7 +54,7 @@ const MainNavigator = () => {
         />
         <Tab.Screen
           name="Leaderboard"
-          component={WorkoutContainer}
+          component={LeaderboardContainer}
           options={{
             tabBarIconStyle: { display: 'none' },
             tabBarLabelPosition: 'beside-icon',

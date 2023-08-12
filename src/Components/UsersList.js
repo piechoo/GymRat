@@ -16,7 +16,12 @@ const styles = StyleSheet.create({
   textInput: { flexGrow: 1 },
 })
 
-const UsersList = ({ selectedUsersIds, setIsModalVisible, title }) => {
+const UsersList = ({
+  selectedUsersIds,
+  setIsModalVisible,
+  title,
+  onSelect,
+}) => {
   const [users, setUsers] = useState([])
   const [search, setSearch] = useState('')
 
@@ -114,9 +119,11 @@ const UsersList = ({ selectedUsersIds, setIsModalVisible, title }) => {
               )}
               onPress={() => {
                 setIsModalVisible(false)
-                navigate('Profile', {
-                  userId: item.id,
-                })
+                if (onSelect) onSelect(item.id)
+                else
+                  navigate('Profile', {
+                    userId: item.id,
+                  })
               }}
             />
           )}

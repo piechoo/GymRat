@@ -4,7 +4,7 @@ import { useTheme } from '../Hooks'
 
 interface Props {
   value: number
-  desc: string
+  desc?: string
 }
 
 const styles = StyleSheet.create({
@@ -20,7 +20,9 @@ const NumberValue = ({ value, desc }: Props) => {
       <Text style={[styles.value, { color: NavigationTheme.colors.text }]}>
         {value}
       </Text>
-      <Text style={{ color: NavigationTheme.colors.text }}>{desc}</Text>
+      {desc ? (
+        <Text style={{ color: NavigationTheme.colors.text }}>{desc}</Text>
+      ) : null}
     </View>
   )
 }

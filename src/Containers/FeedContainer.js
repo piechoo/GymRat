@@ -136,7 +136,7 @@ const FeedContainer = React.memo(({ userId, headerComponent }) => {
       ListHeaderComponent={headerComponent}
       ListFooterComponent={renderFooter}
       onEndReached={retrieveMore}
-      onEndReachedThreshold={0}
+      onEndReachedThreshold={1}
       onRefresh={onRefresh}
       refreshing={refreshing}
     />

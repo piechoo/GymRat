@@ -21,12 +21,14 @@ interface Props {
   setSelectedExcercises: (stateFunction: (state: any) => void) => void
   selectedExcercises: WorkoutExcercise[]
   setIsModalVisible: (isVisible: boolean) => void
+  singleChoice: boolean
 }
 
 const ExcercisesList = ({
   setSelectedExcercises,
   selectedExcercises,
   setIsModalVisible,
+  singleChoice,
 }: Props) => {
   const [selectedBodypart, setSelectedBodypart] = useState(null)
   const { t } = useTranslation()
@@ -83,6 +85,7 @@ const ExcercisesList = ({
                   if (state.indexOf(item) === -1) return [...state, item]
                   return state.filter((n: WorkoutExcercise) => n.id !== item.id)
                 })
+                if (singleChoice) setIsModalVisible(false)
               }}
               style={{
                 backgroundColor: !!selectedExcercises.find(

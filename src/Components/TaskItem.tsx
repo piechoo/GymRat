@@ -19,7 +19,7 @@ export const defaultTask = {
   completedTask: {
     id: 'essa',
     userId: 'xfzY3WbiwSZeokUN5fAFDm6881h2',
-    taskCreatorUserId: '9hrqoQRsLfeDGeh2s9pqj5b6lOn2',
+    taskCreator: '9hrqoQRsLfeDGeh2s9pqj5b6lOn2',
     excerciseId: 1,
     weight: 12,
     reps: 8,
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
 })
 
 const TaskItem = memo(({ task }: Props) => {
+  console.log(JSON.stringify(task))
   return (
     <Surface style={styles.surface} elevation={1}>
       <Text variant="titleLarge" style={{ padding: 5 }}>
@@ -71,14 +72,20 @@ const TaskItem = memo(({ task }: Props) => {
             {findNameFromId(task.completedTask.excerciseId)}
           </Text>
           <SimpleUserPreview
-            userId={task.completedTask.taskCreatorUserId}
+            userId={task.completedTask.taskCreator}
             size={UserPreviewSize.small}
             disabled
           />
         </View>
         <View style={styles.setButton}>
-          <NumberValue value={task.completedTaskSet.weight} desc="KG" />
-          <NumberValue value={task.completedTaskSet.reps} desc="Reps" />
+          <NumberValue
+            value={task.completedTaskSet?.weight ?? task.completedTask?.weight}
+            desc="KG"
+          />
+          <NumberValue
+            value={task.completedTaskSet?.reps ?? task.completedTask?.reps}
+            desc="Reps"
+          />
         </View>
       </View>
     </Surface>

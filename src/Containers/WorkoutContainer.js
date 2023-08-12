@@ -506,10 +506,11 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
             style={{ height: '100%' }}
             contentContainerStyle={{
               alignItems: 'center',
+              paddingHorizontal: 10,
             }}
           >
             <Text variant="headlineMedium" style={{ paddingTop: 20 }}>
-              Workout Completed!{' '}
+              Workout Completed!
             </Text>
             <IconButton icon={'fire'} iconColor={'red'} size={182} />
             <Text>Congratulations! Your current day streak is: </Text>
@@ -519,7 +520,9 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
               <>
                 <Text>Completed tasks:</Text>
                 {currentCompletedTasks.map(el => {
-                  return <TaskItem task={el} />
+                  return (
+                    <TaskItem task={el} key={el.completedTask.creationDate} />
+                  )
                 })}
 
                 <Text variant="titleMedium">

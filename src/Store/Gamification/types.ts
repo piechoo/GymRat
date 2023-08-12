@@ -1,4 +1,4 @@
-type GamificationRecord = {
+export type GamificationRecord = {
   userId: string
   overall: number
   totalLoad: number
@@ -13,7 +13,7 @@ type GamificationRecord = {
 export type ActiveTaskRecord = {
   id: string
   userId: string
-  taskCreatorUserId: string
+  taskCreator: string
   excerciseId: number
   weight: number
   reps: number
