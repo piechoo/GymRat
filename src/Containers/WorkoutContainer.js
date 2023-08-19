@@ -264,7 +264,6 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           new Date().getTime() -
           gamification.lastExcerciseDay.toDate().getTime()
 
-        // To calculate the no. of days between two dates
         const diffInDays = diffInTime / (1000 * 3600 * 24)
 
         if (diffInDays <= 1) {
@@ -286,23 +285,18 @@ const WorkoutContainer = React.memo(({ route, navigation }) => {
           lastExcerciseDay: firestore.Timestamp.fromDate(new Date()),
           tasksCompleted: currentTasksCompleted,
           totalLoad: gamification.totalLoad + load,
-          overall: gamification.overall + load + completedTasks.length * 1000,
+          overall: gamification.overall + load + completedTasks.length * 10000,
         })
       }
 
       const result = await batch.commit()
 
       if (!isWorkoutSaved) {
-        console.log(completedTasks)
-        console.log(daysStreak)
         setCurrentStreak(daysStreak)
         setIsStreakModalVisible(true)
         setCurrentCompletedTasks(completedTasks)
-        // pokazać modal z liczbą streak i listą wykonanych zadań
       }
       setUser?.({ ...user, bestLifts: newBestLifts })
-      // setExcercises([])
-      // navigation.navigate('Feed')
     } else {
       setShowSnackbar(true)
     }

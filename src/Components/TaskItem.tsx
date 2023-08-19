@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
 })
 
 const TaskItem = memo(({ task }: Props) => {
-  console.log(JSON.stringify(task))
   return (
     <Surface style={styles.surface} elevation={1}>
       <Text variant="titleLarge" style={{ padding: 5 }}>
