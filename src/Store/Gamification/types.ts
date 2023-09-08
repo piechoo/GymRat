@@ -6,7 +6,7 @@ export type GamificationRecord = {
   dailyBonus: number
   tasksCompleted: number
   excerciseDayStreak: number
-  loginBonusDate: Date // zeby odebrac tylko raz dziennie
+  loginBonusDate: Date
   lastExcerciseDay: Date
 }
 

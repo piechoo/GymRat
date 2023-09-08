@@ -16,7 +16,6 @@ import firestore from '@react-native-firebase/firestore'
 
 const Stack = createStackNavigator()
 
-// @refresh reset
 const ApplicationNavigator = () => {
   const { Layout, darkMode, NavigationTheme } = useTheme()
   const { colors } = NavigationTheme

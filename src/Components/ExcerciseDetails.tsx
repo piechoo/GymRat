@@ -132,11 +132,11 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
       datasets: [
         {
           data: historicalExcrecises.values,
-          color: () => theme.colors.secondary, // optional
-          strokeWidth: 2, // optional
+          color: () => theme.colors.secondary, 
+          strokeWidth: 2, 
         },
       ],
-      legend: ['Weight (KG)'], // optional
+      legend: ['Weight (KG)'], 
       oneRepMax: parseFloat(`${oneRepMax}`).toFixed(2),
     }
   }, [historicalExcrecises, theme])
@@ -158,7 +158,7 @@ const ExcerciseDetails = memo(({ excerciseId }: Props) => {
           chartConfig={{
             backgroundGradientFrom: theme.colors.background,
             backgroundGradientTo: theme.colors.background,
-            decimalPlaces: 2, // optional, defaults to 2dp
+            decimalPlaces: 2, 
             color: () => theme.colors.text,
             labelColor: theme.colors.text,
             style: {

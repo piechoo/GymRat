@@ -11,7 +11,6 @@ import LeaderboardContainer from '../Containers/LeaderboardContainer'
 
 const Tab = createBottomTabNavigator()
 
-// @refresh reset
 const MainNavigator = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
 

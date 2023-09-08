@@ -92,7 +92,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   text: {
-    // fontFamily: 'Kufam-SemiBoldItalic',
     fontSize: 28,
     marginBottom: 10,
   },

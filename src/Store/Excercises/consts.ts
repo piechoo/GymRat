@@ -104,7 +104,6 @@ export const getWorkoutTags = excercises => {
       if (a.value > b.value) {
         return 1
       }
-      // a must be equal to b
       return 0
     })
 }

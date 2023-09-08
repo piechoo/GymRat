@@ -44,15 +44,12 @@ const LeaderboardContainer = React.memo(({ headerComponent }) => {
 
   const retrieveData = async () => {
     try {
-      // Set State: Loading
       setRefreshing(true)
       console.log('Retrieving Data')
-      // Cloud Firestore: Query
       let initialQuery
       if (!isFriendsOnly)
         initialQuery = await firestore()
           .collection('gamification')
-          // .where('userId', '==', userId)
           .orderBy('overall', 'desc')
           .limit(limit)
       else if (isFriendsOnly)
@@ -61,14 +58,8 @@ const LeaderboardContainer = React.memo(({ headerComponent }) => {
           .where('userId', 'in', [...user.followed, user.uid])
           .orderBy('overall', 'desc')
           .limit(limit)
-      // else
-      //   initialQuery = await firestore()
-      //     .collection('gamification')
-      //     .orderBy('postTime', 'desc')
-      //     .limit(limit)
-      // Cloud Firestore: Query Snapshot
+
       let documentSnapshots = await initialQuery.get()
-      // Cloud Firestore: Document Data
       let documentLocalData = documentSnapshots.docs.map(document =>
         document.data(),
       )
@@ -80,7 +71,6 @@ const LeaderboardContainer = React.memo(({ headerComponent }) => {
         el => el.userId === user.uid,
       )
       setGamification(userGamification)
-      // Set State
       console.log(JSON.stringify(documentLocalData))
 
       setDocumentData(documentLocalData)
@@ -145,22 +135,6 @@ const LeaderboardContainer = React.memo(({ headerComponent }) => {
     }
   }, [user?.uid])
 
-  // const fetchUserGamification = useCallback(async () => {
-  //   try {
-  //     await firestore()
-  //       .collection('gamification')
-  //       .doc(user.uid)
-  //       .get()
-  //       .then(documentSnapshot => {
-  //         if (documentSnapshot.exists) {
-  //           setGamification(documentSnapshot.data())
-  //         }
-  //       })
-  //   } catch (e) {
-  //     console.log(e)
-  //   }
-  // }, [user?.uid])
-
   const retrieveMore = async () => {
     if (!isAllLoaded.current) {
       try {
@@ -188,9 +162,7 @@ const LeaderboardContainer = React.memo(({ headerComponent }) => {
             .startAfter(lastVisible)
             .limit(limit)
 
-        // Cloud Firestore: Query Snapshot
         let documentSnapshots = await additionalQuery.get()
-        // Cloud Firestore: Document Data
         let documentLocalData = documentSnapshots.docs.map(document =>
           document.data(),
         )
@@ -227,7 +199,6 @@ const LeaderboardContainer = React.memo(({ headerComponent }) => {
   useEffect(() => {
     setDocumentData([])
     fetchUserTasks()
-    // fetchUserGamification()
     setLastVisible('')
     canUserCreateTask()
     retrieveData()
@@ -238,7 +209,6 @@ const LeaderboardContainer = React.memo(({ headerComponent }) => {
       new Date().getTime() -
       gamification?.loginBonusDate?.toDate?.().getTime?.()
 
-    // To calculate the no. of days between two dates
     const diffInDays = diffInTime / (1000 * 3600 * 24)
 
     return (

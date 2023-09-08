@@ -78,7 +78,6 @@ const EditProfileScreen = () => {
     const uploadUri = image
     let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1)
 
-    // Add timestamp to File Name
     const extension = filename.split('.').pop()
     const name = filename.split('.').slice(0, -1).join('.')
     filename = name + Date.now() + '.' + extension
@@ -89,7 +88,6 @@ const EditProfileScreen = () => {
     const storageRef = storage().ref(`photos/${filename}`)
     const task = storageRef.putFile(uploadUri)
 
-    // Set transferred state
     task.on('state_changed', taskSnapshot => {
       console.log(
         `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
@@ -109,10 +107,6 @@ const EditProfileScreen = () => {
       setUploading(false)
       setImage(null)
 
-      // Alert.alert(
-      //   'Image uploaded!',
-      //   'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
-      // );
       return url
     } catch (e) {
       console.log(e)

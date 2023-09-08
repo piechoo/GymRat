@@ -19,10 +19,8 @@ const FeedContainer = React.memo(({ userId, headerComponent }) => {
 
   const retrieveData = async () => {
     try {
-      // Set State: Loading
       setRefreshing(true)
       console.log('Retrieving Data')
-      // Cloud Firestore: Query
       let initialQuery
       if (userId)
         initialQuery = await firestore()
@@ -41,16 +39,13 @@ const FeedContainer = React.memo(({ userId, headerComponent }) => {
           .collection('workouts')
           .orderBy('postTime', 'desc')
           .limit(limit)
-      // Cloud Firestore: Query Snapshot
       let documentSnapshots = await initialQuery.get()
-      // Cloud Firestore: Document Data
       let documentLocalData = documentSnapshots.docs.map(document =>
         document.data(),
       )
       if (documentLocalData.length !== limit) isAllLoaded.current = true
       let lastLocalVisible =
         documentLocalData[documentLocalData.length - 1].postTime
-      // Set State
       setDocumentData(documentLocalData)
       setLastVisible(lastLocalVisible)
       setRefreshing(false)
@@ -86,9 +81,7 @@ const FeedContainer = React.memo(({ userId, headerComponent }) => {
             .startAfter(lastVisible)
             .limit(limit)
 
-        // Cloud Firestore: Query Snapshot
         let documentSnapshots = await additionalQuery.get()
-        // Cloud Firestore: Document Data
         let documentLocalData = documentSnapshots.docs.map(document =>
           document.data(),
         )

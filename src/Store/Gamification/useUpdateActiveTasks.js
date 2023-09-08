@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import firestore from '@react-native-firebase/firestore'
 import { getCompletedTasks } from './utils'
 
