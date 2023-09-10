@@ -1,0 +1,34 @@
+diff --git a/node_modules/react-native/react.gradle b/node_modules/react-native/react.gradle
+index 2e9d8e5..3a74cec 100644
+--- a/node_modules/react-native/react.gradle
++++ b/node_modules/react-native/react.gradle
+@@ -243,6 +243,21 @@ afterEvaluate {
+                 jsSourceMapsDir.deleteDir()
+                 jsSourceMapsDir.mkdirs()
+             }
++            doLast {
++                def moveFunc = { resSuffix ->
++                    File originalDir = file("$buildDir/generated/res/react/release/drawable-${resSuffix}");
++                    if (originalDir.exists()) {
++                        File destDir = file("$buildDir/../src/main/res/drawable-${resSuffix}");
++                        ant.move(file: originalDir, tofile: destDir);
++                    }
++                }
++                moveFunc.curry("ldpi").call()
++                moveFunc.curry("mdpi").call()
++                moveFunc.curry("hdpi").call()
++                moveFunc.curry("xhdpi").call()
++                moveFunc.curry("xxhdpi").call()
++                moveFunc.curry("xxxhdpi").call()
++            }
+ 
+             // Set up inputs and outputs so gradle can cache the result
+             inputs.files fileTree(dir: reactRoot, excludes: inputExcludes)
+diff --git a/node_modules/react-native/scripts/.packager.bat b/node_modules/react-native/scripts/.packager.bat
+new file mode 100644
+index 0000000..e89260e
+--- /dev/null
++++ b/node_modules/react-native/scripts/.packager.bat
+@@ -0,0 +1 @@
++set RCT_METRO_PORT=8081
+\ No newline at end of file
