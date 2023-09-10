@@ -20,8 +20,7 @@ export default function () {
   const isDark = false
   const darkMode = colorScheme === 'dark' ? true : isDark
   //Select the right theme light theme ({} if not exist)
-  const { Variables: themeConfigVars = {}, ...themeConfig } =
-    themes[currentTheme] || {}
+  const { Variables: themeConfigVars = {}, ...themeConfig } = {}
 
   const { Variables: darkThemeConfigVars = {}, ...darkThemeConfig } = darkMode
     ? themes[`${currentTheme}_dark`] || {}
@@ -39,11 +38,6 @@ export default function () {
     Gutters: Gutters(themeVariables),
     Images: Images(themeVariables),
     Layout: Layout(themeVariables),
-    Common: Common({
-      ...themeVariables,
-      Layout: Layout(themeVariables),
-      Gutters: Gutters(themeVariables),
-    }),
     ...themeVariables,
   }
 

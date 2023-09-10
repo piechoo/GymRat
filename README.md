@@ -12,7 +12,7 @@ This mobile app allows user to create workouts, check friends workouts, compete 
 
 ## Build and run project
 
-### Build
+### Install dependencies
 
 To build project following commands should be run from project directory:
 
@@ -23,7 +23,7 @@ npm install
 
 ---
 
-### Run
+### Run Debug
 
 To run this project Android Device should be connected to PC with debugging via USB enabled.
 Following commands should be run from project directory:
@@ -33,6 +33,18 @@ npm run android
 ```
 
 Now application should install and run on connected device.
+
+---
+
+### Create Apk
+
+Go into android directory and run following command:
+
+```
+./gradlew assembleRelease
+```
+
+Now apk file should be present in android\app\build\outputs\apk\release directory
 
 ---
 
